@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { loginUser } from "./loginApi";
-import { Session } from "../model/common";
-import { CustomError } from "../model/CustomError";
-import { TextField, Button, Container, Typography, Box, Alert } from "@mui/material";
+import { Session } from "../../model/common";
+import { CustomError } from "../../model/CustomError";
+import {TextField, Button, Container, Typography, Box, Alert, Link} from "@mui/material";
 
 export function Login() {
     const [error, setError] = useState({} as CustomError);
@@ -64,6 +64,12 @@ export function Login() {
                         {error.message}
                     </Alert>
                 )}
+
+                <Box sx={{ mt: 2 }}>
+                    <Link href="/register" variant="body2">
+                        Dont have an account? Register here
+                    </Link>
+                </Box>
             </Box>
         </Container>
     );

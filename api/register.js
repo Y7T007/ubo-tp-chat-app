@@ -35,7 +35,14 @@ export default async function handler(request) {
         const externalId = crypto.randomUUID().toString();
         await client.sql`insert into users (username, password, email, created_on, external_id) values (${username}, ${hashed64}, ${email}, now(), ${externalId})`;
 
-        return new Response(JSON.stringify({ message: "User registered successfully" }), {
+        const token = crypto.randomUUID().toString();
+        const user = { id: externalId, username, email, externalId };
+        await redis.set(token, user, { ex: 3600 });
+        const userInfo = {};
+        userInfo[user.id] = user;
+        await redis.hset("users", userInfo);
+
+        return new Response(JSON.stringify({ token, username, externalId, id: externalId }), {
             status: 201,
             headers: { 'content-type': 'application/json' },
         });
