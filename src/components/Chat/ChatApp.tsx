@@ -1,16 +1,17 @@
-// src/components/Chat/ChatApp.tsx
 import { useEffect, useState } from "react";
-import { Container, Box } from "@mui/material";
+import { Container, Box } from "@mui/joy";
 import { useNavigate } from "react-router-dom";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
 import UserList from "../User/UserList";
+import GroupChat from "./GroupChat";
 import { getUsers, getMessages, checkSession } from "../../services/chatApi";
 
 interface User {
     user_id: number;
     username: string;
+    message: string;
 }
 
 const ChatApp = () => {
@@ -65,6 +66,7 @@ const ChatApp = () => {
                 <Box sx={{ display: "flex", flex: 1 }}>
                     <UserList users={users} onSelectUser={handleSelectUser} />
                     <ChatMessages messages={messages} />
+                    <GroupChat />
                 </Box>
                 <ChatInput selectedUser={selectedUser} onMessageSent={handleMessageSent} />
             </Box>

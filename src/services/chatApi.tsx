@@ -51,3 +51,18 @@ export const checkSession = async (): Promise<boolean> => {
 
     return response.ok;
 };
+
+export const getGroupMessages = async () => {
+    const response = await fetch("/api/group-messages");
+    return response.json();
+};
+
+export const sendGroupMessage = async (message: { content: string }) => {
+    await fetch("/api/group-messages", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(message),
+    });
+};
