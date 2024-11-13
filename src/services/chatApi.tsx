@@ -17,8 +17,8 @@ export const getUsers = async () => {
     }
 };
 
-export const getMessages = async () => {
-    const response = await fetch("/api/messages", {
+export const getMessages = async (toUserId: number) => {
+    const response = await fetch(`/api/messages?toUserId=${toUserId}`, {
         headers: getAuthHeaders(),
     });
     if (response.ok) {
@@ -34,7 +34,7 @@ interface SendMessageParams {
 }
 
 export const sendMessage = async ({ content, to }: SendMessageParams) => {
-    const response = await fetch("/api/message", {
+    const response = await fetch("/api/messages", {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({ content, to }),

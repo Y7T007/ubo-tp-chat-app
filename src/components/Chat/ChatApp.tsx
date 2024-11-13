@@ -8,7 +8,7 @@ import UserList from "../User/UserList";
 import { getUsers, getMessages, checkSession } from "../../services/chatApi";
 
 interface User {
-    id: number;
+    user_id: number;
     username: string;
 }
 
@@ -16,6 +16,7 @@ const ChatApp = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [messages, setMessages] = useState([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [selectedUserName, setSelectedUserName] = useState<string>("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -28,20 +29,33 @@ const ChatApp = () => {
 
             const users = await getUsers();
             setUsers(users);
-
-            const messages = await getMessages();
-            setMessages(messages);
         };
 
         initialize();
     }, [navigate]);
 
+    useEffect(() => {
+        const fetchMessages = async () => {
+            if (selectedUser) {
+                const messages = await getMessages(selectedUser.user_id);
+                setMessages(messages);
+            }
+        };
+
+        fetchMessages();
+    }, [selectedUser]);
+
+    const handleSelectUser = (user: User) => {
+        setSelectedUser(user);
+        setSelectedUserName(user.username);
+    };
+
     return (
         <Container maxWidth="lg">
             <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-                <ChatHeader />
+                <ChatHeader selectedUserName={selectedUserName} />
                 <Box sx={{ display: "flex", flex: 1 }}>
-                    <UserList users={users} onSelectUser={setSelectedUser} />
+                    <UserList users={users} onSelectUser={handleSelectUser} />
                     <ChatMessages messages={messages} />
                 </Box>
                 <ChatInput selectedUser={selectedUser} />

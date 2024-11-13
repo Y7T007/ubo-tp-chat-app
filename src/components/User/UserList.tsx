@@ -2,7 +2,7 @@ import { Box, List } from "@mui/material";
 import UserItem from "./UserItem";
 
 interface User {
-    id: number;
+    user_id: number;
     username: string;
 }
 
@@ -16,7 +16,7 @@ const UserList = ({ users, onSelectUser }: UserListProps) => {
         <Box sx={{ width: 200, borderRight: "1px solid #ddd", overflowY: "auto" }}>
             <List>
                 {users.map((user: User) => (
-                    <UserItem key={user.id} name={user.username} onClick={() => onSelectUser(user)} />
+                    <UserItem key={user.user_id} name={user.username} onClick={() => onSelectUser(user)} />
                 ))}
             </List>
         </Box>

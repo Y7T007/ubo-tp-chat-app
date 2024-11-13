@@ -3,7 +3,7 @@ import { useState } from "react";
 import { sendMessage } from "../../services/chatApi";
 
 interface User {
-    id: number;
+    user_id: number;
     username: string;
 }
 
@@ -12,7 +12,7 @@ const ChatInput = ({ selectedUser }: { selectedUser: User | null }) => {
 
     const handleSend = async () => {
         if (message.trim() && selectedUser) {
-            await sendMessage({ content: message, to: selectedUser.id });
+            await sendMessage({ content: message, to: selectedUser.user_id });
             setMessage("");
         }
     };
