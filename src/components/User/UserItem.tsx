@@ -2,11 +2,12 @@ import { ListItem, ListItemText } from "@mui/material";
 
 interface UserItemProps {
     name: string;
+    onClick: () => void;
 }
 
-const UserItem = ({ name }: UserItemProps) => {
+const UserItem = ({ name, onClick }: UserItemProps) => {
     return (
-        <ListItem>
+        <ListItem onClick={onClick}>
             <ListItemText primary={name} />
         </ListItem>
     );

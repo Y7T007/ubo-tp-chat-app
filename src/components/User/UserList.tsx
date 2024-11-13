@@ -6,12 +6,17 @@ interface User {
     username: string;
 }
 
-const UserList = ({ users }: { users: User[] }) => {
+interface UserListProps {
+    users: User[];
+    onSelectUser: (user: User) => void;
+}
+
+const UserList = ({ users, onSelectUser }: UserListProps) => {
     return (
         <Box sx={{ width: 200, borderRight: "1px solid #ddd", overflowY: "auto" }}>
             <List>
                 {users.map((user: User) => (
-                    <UserItem key={user.id} name={user.username} />
+                    <UserItem key={user.id} name={user.username} onClick={() => onSelectUser(user)} />
                 ))}
             </List>
         </Box>

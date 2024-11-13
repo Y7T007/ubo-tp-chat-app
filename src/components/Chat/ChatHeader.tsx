@@ -4,7 +4,7 @@ const ChatHeader = () => {
     return (
         <AppBar position="static">
             <Toolbar>
-                <Typography variant="h6">Chat Application</Typography>
+                <Typography variant="h6">UBO-TP-CHAT-APP</Typography>
             </Toolbar>
         </AppBar>
     );

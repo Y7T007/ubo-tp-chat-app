@@ -1,5 +1,15 @@
+const getAuthHeaders = () => {
+    const token = sessionStorage.getItem('token');
+    return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+    };
+};
+
 export const getUsers = async () => {
-    const response = await fetch("/api/users");
+    const response = await fetch("/api/users", {
+        headers: getAuthHeaders(),
+    });
     if (response.ok) {
         return response.json();
     } else {
@@ -8,7 +18,9 @@ export const getUsers = async () => {
 };
 
 export const getMessages = async () => {
-    const response = await fetch("/api/messages");
+    const response = await fetch("/api/messages", {
+        headers: getAuthHeaders(),
+    });
     if (response.ok) {
         return response.json();
     } else {
@@ -16,15 +28,26 @@ export const getMessages = async () => {
     }
 };
 
-export const sendMessage = async ({content}: { content: any }) => {
+interface SendMessageParams {
+    content: string;
+    to: number;
+}
+
+export const sendMessage = async ({ content, to }: SendMessageParams) => {
     const response = await fetch("/api/message", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content }),
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ content, to }),
     });
     if (!response.ok) {
         throw new Error("Failed to send message");
     }
+};
+
+export const checkSession = async (): Promise<boolean> => {
+    const response = await fetch("/api/check-session", {
+        headers: getAuthHeaders(),
+    });
+
+    return response.ok;
 };

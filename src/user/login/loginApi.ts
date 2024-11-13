@@ -1,22 +1,21 @@
-import {Session, SessionCallback, ErrorCallback, User} from "../../model/common";
-import {CustomError} from "../../model/CustomError";
+import { Session, SessionCallback, ErrorCallback, User } from "../../model/common";
+import { CustomError } from "../../model/CustomError";
 
 export function loginUser(user: User, onResult: SessionCallback, onError: ErrorCallback) {
-    fetch("/api/login",
-        {
-            method: "POST", // ou 'PUT'
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(user),
-        })
+    fetch("/api/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+    })
         .then(async (response) => {
             if (response.ok) {
                 const session = await response.json() as Session;
                 sessionStorage.setItem('token', session.token);
                 sessionStorage.setItem('externalId', session.externalId);
                 sessionStorage.setItem('username', session.username || "");
-                onResult(session)
+                onResult(session);
             } else {
                 const error = await response.json() as CustomError;
                 onError(error);
