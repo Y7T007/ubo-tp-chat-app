@@ -2,7 +2,7 @@ import { useState } from "react";
 import { loginUser } from "./loginApi";
 import { Session } from "../../model/common";
 import { CustomError } from "../../model/CustomError";
-import {TextField, Button, Container, Typography, Box, Alert, Link} from "@mui/material";
+import { TextField, Button, Container, Typography, Box, Alert, Link } from "@mui/material";
 
 export function Login() {
     const [error, setError] = useState({} as CustomError);
@@ -56,7 +56,7 @@ export function Login() {
                 </form>
                 {session.token && (
                     <Typography variant="body1" sx={{ mt: 2 }}>
-                        {session.username} : {session.token}
+                        Welcome, {session.username}!
                     </Typography>
                 )}
                 {error.message && (
@@ -67,7 +67,7 @@ export function Login() {
 
                 <Box sx={{ mt: 2 }}>
                     <Link href="/register" variant="body2">
-                        Dont have an account? Register here
+                        Don't have an account? Register here
                     </Link>
                 </Box>
             </Box>
