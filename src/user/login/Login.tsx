@@ -67,7 +67,7 @@ export function Login() {
 
                 <Box sx={{ mt: 2 }}>
                     <Link href="/register" variant="body2">
-                        Don't have an account? Register here
+                        Dont have an account? Register here
                     </Link>
                 </Box>
             </Box>
