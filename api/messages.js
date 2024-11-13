@@ -13,28 +13,53 @@ export default async function handler(request) {
             return unauthorizedResponse();
         }
 
-        const toUserId = new URL(request.url).searchParams.get("toUserId");
-        if (!toUserId) {
-            return new Response(JSON.stringify({ message: "Bad Request" }), {
-                status: 400,
-                headers: { 'content-type': 'application/json' },
-            });
-        }
+        if (request.method === "GET") {
+            const toUserId = new URL(request.url).searchParams.get("toUserId");
+            if (!toUserId) {
+                return new Response(JSON.stringify({ message: "Bad Request" }), {
+                    status: 400,
+                    headers: { 'content-type': 'application/json' },
+                });
+            }
 
-        const { rowCount, rows } = await sql`
-            SELECT * FROM messages 
-            WHERE (to_user = ${user.id} AND from_user = ${toUserId}) 
-               OR (to_user = ${toUserId} AND from_user = ${user.id}) 
-            ORDER BY created_on DESC
-        `;
-        if (rowCount === 0) {
-            return new Response("[]", {
-                status: 200,
+            const { rowCount, rows } = await sql`
+                SELECT * FROM messages 
+                WHERE (to_user = ${user.id} AND from_user = ${toUserId}) 
+                   OR (to_user = ${toUserId} AND from_user = ${user.id}) 
+                ORDER BY created_on DESC
+            `;
+            if (rowCount === 0) {
+                return new Response("[]", {
+                    status: 200,
+                    headers: { 'content-type': 'application/json' },
+                });
+            } else {
+                return new Response(JSON.stringify(rows), {
+                    status: 200,
+                    headers: { 'content-type': 'application/json' },
+                });
+            }
+        } else if (request.method === "POST") {
+            const { content, to } = await request.json();
+            if (!content || !to) {
+                return new Response(JSON.stringify({ message: "Bad Request" }), {
+                    status: 400,
+                    headers: { 'content-type': 'application/json' },
+                });
+            }
+
+            await sql`
+                INSERT INTO messages (from_user, to_user, content, created_on)
+                VALUES (${user.id}, ${to}, ${content}, NOW())
+            `;
+
+            return new Response(JSON.stringify({ message: "Message sent" }), {
+                status: 201,
                 headers: { 'content-type': 'application/json' },
             });
         } else {
-            return new Response(JSON.stringify(rows), {
-                status: 200,
+            return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
+                status: 405,
                 headers: { 'content-type': 'application/json' },
             });
         }
