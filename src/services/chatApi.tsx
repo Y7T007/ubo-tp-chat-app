@@ -66,3 +66,36 @@ export const sendGroupMessage = async (message: { content: string }) => {
         body: JSON.stringify(message),
     });
 };
+
+export const getRooms = async () => {
+    const response = await fetch("/api/rooms", {
+        headers: getAuthHeaders(),
+    });
+    if (response.ok) {
+        return response.json();
+    } else {
+        throw new Error("Failed to fetch rooms");
+    }
+};
+
+export const getRoomMessages = async (roomId: number) => {
+    const response = await fetch(`/api/room-messages?roomId=${roomId}`, {
+        headers: getAuthHeaders(),
+    });
+    if (response.ok) {
+        return response.json();
+    } else {
+        throw new Error("Failed to fetch room messages");
+    }
+};
+
+export const sendRoomMessage = async ({ content, roomId }: { content: string; roomId: number }) => {
+    const response = await fetch("/api/room-messages", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ content, roomId }),
+    });
+    if (!response.ok) {
+        throw new Error("Failed to send room message");
+    }
+};

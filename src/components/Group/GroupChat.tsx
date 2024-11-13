@@ -1,6 +1,6 @@
 import { useEffect, useState, ChangeEvent } from "react";
 import { Box, Typography, List, ListItem, ListItemDecorator, ListItemContent, Avatar, Button } from "@mui/joy";
-import { getGroupMessages, sendGroupMessage } from "../../services/chatApi";
+import { getRoomMessages, sendRoomMessage } from "../../services/chatApi";
 import { TextField } from "@mui/material";
 
 interface Message {
@@ -10,29 +10,36 @@ interface Message {
     from_user: number;
 }
 
-const GroupChat = () => {
+interface Room {
+    room_id: number;
+    name: string;
+}
+
+const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [message, setMessage] = useState("");
     const currentUserId = parseInt(sessionStorage.getItem("id") || "0");
 
     useEffect(() => {
         const fetchMessages = async () => {
-            const response = await getGroupMessages();
-            if (Array.isArray(response)) {
-                setMessages(response);
-            } else {
-                setMessages([]);
+            if (selectedRoom) {
+                const response = await getRoomMessages(selectedRoom.room_id);
+                if (Array.isArray(response)) {
+                    setMessages(response);
+                } else {
+                    setMessages([]);
+                }
             }
         };
 
         fetchMessages();
-    }, []);
+    }, [selectedRoom]);
 
     const handleSend = async () => {
-        if (message.trim()) {
-            await sendGroupMessage({ content: message });
+        if (message.trim() && selectedRoom) {
+            await sendRoomMessage({ content: message, roomId: selectedRoom.room_id });
             setMessage("");
-            const response = await getGroupMessages();
+            const response = await getRoomMessages(selectedRoom.room_id);
             if (Array.isArray(response)) {
                 setMessages(response);
             } else {
