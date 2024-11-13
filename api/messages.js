@@ -26,7 +26,7 @@ export default async function handler(request) {
                 SELECT * FROM messages 
                 WHERE (to_user = ${user.id} AND from_user = ${toUserId}) 
                    OR (to_user = ${toUserId} AND from_user = ${user.id}) 
-                ORDER BY created_on DESC
+                ORDER BY created_on ASC
             `;
             if (rowCount === 0) {
                 return new Response("[]", {

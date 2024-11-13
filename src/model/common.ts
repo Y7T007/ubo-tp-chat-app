@@ -15,7 +15,7 @@ export interface User {
 export interface Session {
     token: string;
     username?: string;
-    id?: number;
+    id: number;
     externalId: string;
 }
 
