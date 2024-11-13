@@ -3,7 +3,6 @@ import { Container, Box } from "@mui/joy";
 import { useNavigate } from "react-router-dom";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
-import ChatInput from "./ChatInput";
 import GroupChat from "../Group/GroupChat";
 import Sidebar from "../SideBar/SideBar";
 import { getUsers, getMessages, checkSession } from "../../services/chatApi";
@@ -70,10 +69,9 @@ const ChatApp = () => {
                     {selectedRoom ? (
                         <GroupChat selectedRoom={selectedRoom} />
                     ) : (
-                        <ChatMessages messages={messages} />
+                        <ChatMessages messages={messages} selectedUser={selectedUser} onMessageSent={handleMessageSent} />
                     )}
                 </Box>
-                <ChatInput selectedUser={selectedUser} onMessageSent={handleMessageSent} />
             </Box>
         </Container>
     );

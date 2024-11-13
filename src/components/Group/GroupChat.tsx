@@ -1,7 +1,7 @@
 import { useEffect, useState, ChangeEvent } from "react";
-import { Box, Typography, List, ListItem, ListItemDecorator, ListItemContent, Avatar, Button } from "@mui/joy";
+import { Box, Typography, List, ListItem, ListItemDecorator, ListItemContent, Avatar } from "@mui/joy";
 import { getRoomMessages, sendRoomMessage } from "../../services/chatApi";
-import { TextField } from "@mui/material";
+import { TextField,Button } from "@mui/material";
 
 interface Message {
     id: number;
@@ -49,7 +49,7 @@ const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
     };
 
     return (
-        <Box sx={{ width: 320 }}>
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <Typography
                 id="group-chat-demo"
                 level="body-xs"
@@ -57,31 +57,35 @@ const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
             >
                 Group Chat
             </Typography>
-            <List
-                aria-labelledby="group-chat-demo"
-                sx={{ '--ListItemDecorator-size': '56px', flex: 1, overflowY: "auto" }}
-            >
-                {messages.map((message: Message) => (
-                    <ListItem key={message.id}>
-                        <ListItemDecorator>
-                            <Avatar src={`/static/images/avatar/${message.from_user}.jpg`} />
-                        </ListItemDecorator>
-                        <ListItemContent>
-                            <Typography level="title-sm">{message.user}</Typography>
-                            <Typography level="body-sm" noWrap>
-                                {message.content}
-                            </Typography>
-                        </ListItemContent>
-                    </ListItem>
-                ))}
-            </List>
+            <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
+                <List
+                    aria-labelledby="group-chat-demo"
+                    sx={{ '--ListItemDecorator-size': '56px' }}
+                >
+                    {messages.map((message: Message) => (
+                        <ListItem key={message.id}>
+                            <ListItemDecorator>
+                                <Avatar src={`/static/images/avatar/${message.from_user}.jpg`} />
+                            </ListItemDecorator>
+                            <ListItemContent>
+                                <Typography level="title-sm">{message.user}</Typography>
+                                <Typography level="body-sm" noWrap>
+                                    {message.content}
+                                </Typography>
+                            </ListItemContent>
+                        </ListItem>
+                    ))}
+                </List>
+            </Box>
             <Box sx={{ display: "flex", padding: 2 }}>
                 <TextField
-                    label="Type a message..."
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Type a message..."
                     value={message}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setMessage(e.target.value)}
                 />
-                <Button color="primary" onClick={handleSend}>
+                <Button variant="contained" color="primary" onClick={handleSend}>
                     Send
                 </Button>
             </Box>

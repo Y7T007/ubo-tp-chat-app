@@ -1,6 +1,8 @@
 import { Box, List } from "@mui/material";
 import Message from "./Message";
+import ChatInput from "./ChatInput";
 import { Component } from "react";
+import {User} from "../../model/common";
 
 interface MessageType {
     id: number;
@@ -10,25 +12,32 @@ interface MessageType {
     to_user: number;
 }
 
-class ChatMessages extends Component<{ messages: MessageType[] }> {
-    render() {
-        const { messages } = this.props;
-        const currentUserId = parseInt(sessionStorage.getItem("id") || "0");
-        console.log(messages)
-        console.log(currentUserId)
-        return (
-            <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
-                <List>
-                    {messages.map((message: MessageType) => (
+interface ChatMessagesProps {
+    messages: MessageType[];
+    selectedUser: User | null;
+    onMessageSent: () => void;
+}
 
-                        <Message
-                            key={message.id}
-                            user={message.user}
-                            content={message.content}
-                            isSender={message.from_user === currentUserId}
-                        />
-                    ))}
-                </List>
+class ChatMessages extends Component<ChatMessagesProps> {
+    render() {
+        const { messages, selectedUser, onMessageSent } = this.props;
+        const currentUserId = parseInt(sessionStorage.getItem("id") || "0");
+
+        return (
+            <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
+                    <List>
+                        {messages.map((message: MessageType) => (
+                            <Message
+                                key={message.id}
+                                user={message.user}
+                                content={message.content}
+                                isSender={message.from_user === currentUserId}
+                            />
+                        ))}
+                    </List>
+                </Box>
+                <ChatInput selectedUser={selectedUser} onMessageSent={onMessageSent} />
             </Box>
         );
     }
