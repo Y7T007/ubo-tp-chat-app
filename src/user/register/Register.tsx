@@ -1,9 +1,26 @@
 import { useState } from "react";
-import { TextField, Button, Container, Typography, Box, Alert } from "@mui/material";
+import { TextField, Button, Container, Typography, Box, Alert, Link, Dialog, DialogTitle, DialogContent, DialogContentText } from "@mui/material";
+import { CheckCircle } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { keyframes } from "@emotion/react";
+
+const bounce = keyframes`
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-30px);
+  }
+  60% {
+    transform: translateY(-15px);
+  }
+`;
 
 export function Register() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -27,6 +44,11 @@ export function Register() {
             setSuccess(result.message);
             setError("");
             form.reset();
+            setDialogOpen(true);
+            setTimeout(() => {
+                setDialogOpen(false);
+                navigate("/login");
+            }, 3000);
         } else {
             setError(result.message);
             setSuccess("");
@@ -78,6 +100,18 @@ export function Register() {
                     </Alert>
                 )}
             </Box>
+            <Dialog
+                open={dialogOpen}
+                onClose={() => setDialogOpen(false)}
+            >
+                <DialogTitle>Registration Successful</DialogTitle>
+                <DialogContent sx={{ textAlign: "center" }}>
+                    <CheckCircle sx={{ color: "green", fontSize: 60, animation: `${bounce} 2s infinite` }} />
+                    <DialogContentText>
+                        You will be redirected to the login page shortly.
+                    </DialogContentText>
+                </DialogContent>
+            </Dialog>
         </Container>
     );
 }
