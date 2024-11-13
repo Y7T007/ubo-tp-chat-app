@@ -4,21 +4,10 @@ import { useNavigate } from "react-router-dom";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
-import UserList from "../User/UserList";
 import GroupChat from "../Group/GroupChat";
-import GroupList from "../Group/GroupList";
+import Sidebar from "../SideBar/SideBar";
 import { getUsers, getMessages, checkSession } from "../../services/chatApi";
-
-interface User {
-    user_id: number;
-    username: string;
-    message: string;
-}
-
-interface Room {
-    room_id: number;
-    name: string;
-}
+import { User, Room } from "../../model/common"; // Import interfaces
 
 const ChatApp = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -77,8 +66,7 @@ const ChatApp = () => {
             <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
                 <ChatHeader selectedUserName={selectedUserName} />
                 <Box sx={{ display: "flex", flex: 1 }}>
-                    <UserList users={users} onSelectUser={handleSelectUser} />
-                    <GroupList onSelectRoom={handleSelectRoom} />
+                    <Sidebar users={users} onSelectUser={handleSelectUser} onSelectRoom={handleSelectRoom} />
                     {selectedRoom ? (
                         <GroupChat selectedRoom={selectedRoom} />
                     ) : (

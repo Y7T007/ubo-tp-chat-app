@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, List, ListItem, ListItemDecorator, ListItemContent, Avatar } from "@mui/joy";
 import { getRooms } from "../../services/chatApi";
-
-interface Room {
-    room_id: number;
-    name: string;
-}
+import { Room } from "../../model/common"; // Import interface
 
 interface GroupListProps {
     onSelectRoom: (room: Room) => void;

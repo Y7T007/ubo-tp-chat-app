@@ -1,11 +1,6 @@
 import * as React from 'react';
 import { Box, Typography, List, ListItem, ListItemDecorator, ListItemContent, Avatar } from '@mui/joy';
-
-interface User {
-    user_id: number;
-    username: string;
-    message: string;
-}
+import { User } from "../../model/common"; // Import interface
 
 interface UserListProps {
     users: User[];
@@ -33,9 +28,9 @@ const UserList = ({ users, onSelectUser }: UserListProps) => {
                         </ListItemDecorator>
                         <ListItemContent>
                             <Typography level="title-sm">{user.username}</Typography>
-                            <Typography level="body-sm" noWrap>
-                                {user.message}
-                            </Typography>
+                            {/*<Typography level="body-sm" noWrap>*/}
+                            {/*    {user.message}*/}
+                            {/*</Typography>*/}
                         </ListItemContent>
                     </ListItem>
                 ))}
