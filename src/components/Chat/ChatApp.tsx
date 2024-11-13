@@ -1,3 +1,4 @@
+// src/components/Chat/ChatApp.tsx
 import { useEffect, useState } from "react";
 import { Container, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -50,6 +51,13 @@ const ChatApp = () => {
         setSelectedUserName(user.username);
     };
 
+    const handleMessageSent = async () => {
+        if (selectedUser) {
+            const messages = await getMessages(selectedUser.user_id);
+            setMessages(messages);
+        }
+    };
+
     return (
         <Container maxWidth="lg">
             <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
@@ -58,7 +66,7 @@ const ChatApp = () => {
                     <UserList users={users} onSelectUser={handleSelectUser} />
                     <ChatMessages messages={messages} />
                 </Box>
-                <ChatInput selectedUser={selectedUser} />
+                <ChatInput selectedUser={selectedUser} onMessageSent={handleMessageSent} />
             </Box>
         </Container>
     );

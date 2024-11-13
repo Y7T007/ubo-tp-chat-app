@@ -7,13 +7,19 @@ interface User {
     username: string;
 }
 
-const ChatInput = ({ selectedUser }: { selectedUser: User | null }) => {
+interface ChatInputProps {
+    selectedUser: User | null;
+    onMessageSent: () => void;
+}
+
+const ChatInput = ({ selectedUser, onMessageSent }: ChatInputProps) => {
     const [message, setMessage] = useState("");
 
     const handleSend = async () => {
         if (message.trim() && selectedUser) {
             await sendMessage({ content: message, to: selectedUser.user_id });
             setMessage("");
+            onMessageSent();
         }
     };
 
