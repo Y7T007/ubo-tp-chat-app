@@ -22,9 +22,13 @@ import {CustomError} from "../../model/CustomError";
 import {Session} from "../../model/common";
 import {useNavigate} from "react-router-dom";
 import {loginUser} from "../../user/login/loginApi";
-import { Alert, Dialog, DialogTitle, DialogContent, DialogContentText } from "@mui/material";
+import {Dialog, DialogTitle, DialogContent, DialogContentText} from "@mui/material";
+import Alert from '@mui/joy/Alert';
 import { CheckCircle } from "@mui/icons-material";
 import { keyframes } from "@emotion/react";
+import ReportIcon from '@mui/icons-material/Report';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+
 
 interface FormElements extends HTMLFormControlsCollection {
     login: HTMLInputElement;
@@ -262,10 +266,27 @@ export default function JoySignInSideTemplate() {
                     </Typography>
                 )}
                 {error.message && (
-                    <Alert severity="error" sx={{ mt: 2 }}>
-                        {error.message}
+                    <Alert
+                        key="Error"
+                        sx={{ alignItems: 'flex-start' }}
+                        startDecorator={<ReportIcon/>}
+                        variant="soft"
+                        color="danger"
+                        endDecorator={
+                            <IconButton variant="soft" color="danger">
+                                <CloseRoundedIcon />
+                            </IconButton>
+                        }
+                    >
+                        <div>
+                            <div>Error</div>
+                            <Typography level="body-sm" color="danger">
+                                {error.message}
+                            </Typography>
+                        </div>
                     </Alert>
                 )}
+
             </Box>
             <Box component="footer" sx={{ py: 3 }}>
                 <Typography level="body-xs" sx={{ textAlign: 'center' }}>
