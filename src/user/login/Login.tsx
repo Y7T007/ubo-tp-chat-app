@@ -58,8 +58,8 @@ export function Login() {
                 </Typography>
                 <form onSubmit={handleSubmit}>
                     <TextField
-                        label="Username"
                         name="login"
+                        label="Username"
                         variant="outlined"
                         fullWidth
                         margin="normal"
