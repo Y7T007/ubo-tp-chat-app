@@ -6,7 +6,9 @@ import ChatMessages from "./ChatMessages";
 import GroupChat from "../Group/GroupChat";
 import Sidebar from "../SideBar/SideBar";
 import { getUsers, getMessages, checkSession } from "../../services/chatApi";
-import { User, Room } from "../../model/common"; // Import interfaces
+import { User, Room } from "../../model/common";
+import GlobalStyles from "@mui/joy/GlobalStyles";
+import * as React from "react";
 
 const ChatApp = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -20,7 +22,7 @@ const ChatApp = () => {
         const initialize = async () => {
             const sessionValid = await checkSession();
             if (!sessionValid) {
-                navigate("/login");
+                navigate("/");
                 return;
             }
 
@@ -61,15 +63,40 @@ const ChatApp = () => {
     };
 
     return (
-        <Container maxWidth="lg">
-            <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-                <ChatHeader selectedUserName={selectedUserName} />
+        <Container
+            sx={{
+                backgroundImage: 'url(https://images.unsplash.com/photo-1527181152855-fc03fc7949c8?auto=format&w=1000&dpr=2)',
+            }}>
+            <GlobalStyles
+                styles={{
+                    ':root': {
+                        '--Form-maxWidth': '800px',
+                        '--Transition-duration': '0.4s',
+                    },
+                }}
+            />
+            <Box
+                sx={(theme) => ({
+                    width: { xs: '100%', md: '50vw' },
+                    transition: 'width var(--Transition-duration)',
+                    transitionDelay: 'calc(var(--Transition-duration) + 0.1s)',
+                    position: 'relative',
+                    zIndex: 1,
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                })}>
                 <Box sx={{ display: "flex", flex: 1 }}>
                     <Sidebar users={users} onSelectUser={handleSelectUser} onSelectRoom={handleSelectRoom} />
                     {selectedRoom ? (
-                        <GroupChat selectedRoom={selectedRoom} />
+                        <Box sx={{ display: "flex", flexDirection: "column"}}>
+                            <ChatHeader selectedUserName={selectedUserName} />
+                            <GroupChat selectedRoom={selectedRoom} />
+                        </Box>
                     ) : (
-                        <ChatMessages messages={messages} selectedUser={selectedUser} onMessageSent={handleMessageSent} />
+                        <Box sx={{ display: "flex", flexDirection: "column"}}>
+                            <ChatHeader selectedUserName={selectedUserName} />
+                            <ChatMessages messages={messages} selectedUser={selectedUser} onMessageSent={handleMessageSent} />
+                        </Box>
                     )}
                 </Box>
             </Box>
