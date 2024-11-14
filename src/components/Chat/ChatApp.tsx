@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import { Container, Box } from "@mui/joy";
 import { useNavigate } from "react-router-dom";
 import ChatHeader from "./ChatHeader";
@@ -17,6 +17,7 @@ const ChatApp = () => {
     const [selectedUserName, setSelectedUserName] = useState<string>("");
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
     const navigate = useNavigate();
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         const initialize = async () => {
@@ -62,6 +63,48 @@ const ChatApp = () => {
         }
     };
 
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+    const getAuthHeaders = () => {
+        const token = sessionStorage.getItem('token');
+        return {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+        };
+    };
+
+    const checkForNewMessages = async () => {
+        try {
+            const response = await fetch("/api/new-messages", {
+                headers: getAuthHeaders(),
+            });
+            if (response.ok) {
+                const newMessages = await response.json();
+                if (newMessages.length > 0) {
+                    newMessages.forEach((message: any) => {
+                        new Notification("New Message", {
+                            body: message.content,
+                            icon: "/path/to/icon.png",
+                        });
+                    });
+                }
+            } else {
+                console.error("Failed to fetch new messages");
+            }
+        } catch (error) {
+            console.error("Error checking for new messages:", error);
+        }
+    };
+
+    useEffect(() => {
+        intervalRef.current = setInterval(checkForNewMessages, 20000);
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, []);
     return (
         <Container
             sx={{
