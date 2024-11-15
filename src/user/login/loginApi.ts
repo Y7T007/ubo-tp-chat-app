@@ -35,6 +35,7 @@ export function loginUser(user: User, onResult: SessionCallback, onError: ErrorC
                 }
 
                 onResult(session);
+
             } else {
                 const error = await response.json() as CustomError;
                 onError(error);
