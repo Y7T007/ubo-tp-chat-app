@@ -1,9 +1,6 @@
 import { getConnecterUser, unauthorizedResponse } from "../lib/session";
 import { sql } from "@vercel/postgres";
-
-export const config = {
-    runtime: 'edge',
-};
+import {publishNotificationToUsers} from "./beams";
 
 export default async function handler(request) {
     try {
@@ -23,9 +20,9 @@ export default async function handler(request) {
             }
 
             const { rowCount, rows } = await sql`
-                SELECT * FROM messages 
-                WHERE (to_user = ${user.id} AND from_user = ${toUserId}) 
-                   OR (to_user = ${toUserId} AND from_user = ${user.id}) 
+                SELECT * FROM messages
+                WHERE (to_user = ${user.id} AND from_user = ${toUserId})
+                   OR (to_user = ${toUserId} AND from_user = ${user.id})
                 ORDER BY created_on ASC
             `;
             if (rowCount === 0) {
@@ -52,6 +49,31 @@ export default async function handler(request) {
                 INSERT INTO messages (from_user, to_user, content, created_on)
                 VALUES (${user.id}, ${to}, ${content}, NOW())
             `;
+
+            // Send notification to the recipient user
+            const notification = {
+                apns: {
+                    aps: {
+                        alert: {
+                            title: "New Message",
+                            body: content,
+                        },
+                    },
+                },
+                fcm: {
+                    notification: {
+                        title: "New Message",
+                        body: content,
+                    },
+                },
+                web: {
+                    notification: {
+                        title: "New Message",
+                        body: content,
+                    },
+                },
+            };
+            await publishNotificationToUsers([to], notification);
 
 
             return new Response(JSON.stringify({ message: "Message sent" }), {
