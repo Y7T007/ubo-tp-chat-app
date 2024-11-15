@@ -60,8 +60,6 @@ async function publishNotificationToUsers(userIds, notification) {
     }
 }
 
-module.exports = { handler, publishNotificationToUsers };
-
 if (require.main === module) {
     // Example usage
     const http = require('http');
