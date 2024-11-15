@@ -45,6 +45,15 @@ const ChatApp = () => {
         fetchMessages();
     }, [selectedUser]);
 
+    useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                const payload = event.data;
+                console.log("Received notification:", payload);
+            });
+        }
+    }, []);
+
     const handleSelectUser = (user: User) => {
         setSelectedUser(user);
         setSelectedUserName(user.username);
