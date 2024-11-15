@@ -1,5 +1,6 @@
 import { getConnecterUser } from '../lib/session';
 import PushNotifications from "@pusher/push-notifications-server";
+import {sql} from "@vercel/postgres";
 
 export default async function handler(request, response) {
     try {
@@ -44,7 +45,15 @@ export async function publishNotificationToUsers(userIds, notification) {
             secretKey: process.env.PUSHER_SECRET_KEY,
         });
 
-        const publishResponse = await beamsClient.publishToUsers(userIds, notification);
+        const externalIds = [];
+        for (const userId of userIds) {
+            const { rows } = await sql`SELECT external_id FROM users WHERE user_id = ${userId}`;
+            if (rows.length > 0) {
+                externalIds.push(rows[0].external_id);
+            }
+        }
+
+        const publishResponse = await beamsClient.publishToUsers(externalIds, notification);
         console.log("Just published:", publishResponse.publishId);
     } catch (error) {
         console.error("Error publishing notification:", error);
