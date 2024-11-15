@@ -23,9 +23,9 @@ export default async function handler(request) {
             }
 
             const { rowCount, rows } = await sql`
-                SELECT * FROM messages 
-                WHERE (to_user = ${user.id} AND from_user = ${toUserId}) 
-                   OR (to_user = ${toUserId} AND from_user = ${user.id}) 
+                SELECT * FROM messages
+                WHERE (to_user = ${user.id} AND from_user = ${toUserId})
+                   OR (to_user = ${toUserId} AND from_user = ${user.id})
                 ORDER BY created_on ASC
             `;
             if (rowCount === 0) {
@@ -52,6 +52,29 @@ export default async function handler(request) {
                 INSERT INTO messages (from_user, to_user, content, created_on)
                 VALUES (${user.id}, ${to}, ${content}, NOW())
             `;
+
+            try {
+                let token = new Headers(request.headers).get('Authorization');
+                if (!token) {
+                    return null;
+                } else {
+                    token = token.replace("Bearer ", "");
+                }
+                await fetch(`${request.headers.get('origin')}/api/send-notification`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        recipientId: to,
+                        messageContent: content,
+                    }),
+                });
+                console.log("Notification request sent");
+            } catch (fetchError) {
+                console.error("Error sending notification request:", fetchError);
+            }
 
             return new Response(JSON.stringify({ message: "Message sent" }), {
                 status: 201,

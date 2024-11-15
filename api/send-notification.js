@@ -1,29 +1,95 @@
 import PushNotifications from "@pusher/push-notifications-server";
+import {Redis} from "@upstash/redis";
+import {sql} from "@vercel/postgres";
+const redis = Redis.fromEnv();
 
+
+// Initialize Pusher Beams client
 const beamsClient = new PushNotifications({
     instanceId: process.env.PUSHER_INSTANCE_ID,
     secretKey: process.env.PUSHER_SECRET_KEY,
 });
 
-export default async function handler(request, response) {
+export default async function handler(request) {
     try {
-        const { userIds, title, body } = request.body;
-        if (!userIds || !title || !body) {
-            return response.status(400).json({ message: "Bad Request" });
+        const user = await getConnecterUser(request);
+        if (!user) {
+            console.log("Not connected");
+            return unauthorizedResponse();
         }
 
-        const publishResponse = await beamsClient.publishToUsers(userIds, {
-            web: {
-                notification: {
-                    title: title,
-                    body: body,
-                },
-            },
-        });
+        if (request.method !== "POST") {
+            return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
+                status: 405,
+                headers: { 'content-type': 'application/json' },
+            });
+        }
+        console.log(request.body.recipientId);
 
-        return response.status(200).json({ message: "Notification sent", publishId: publishResponse.publishId });
+        const {rowCount, rows} = await sql`select external_id from users where user_id=${request.body.recipientId}`;
+        console.log("Got " + rowCount + " users");
+        const external_id=rows[0].external_id;
+
+        const { recipientId, messageContent } = await request.body;
+        if (!external_id || !messageContent) {
+            return new Response(JSON.stringify({ message: "Bad Request" }), {
+                status: 400,
+                headers: { 'content-type': 'application/json' },
+            });
+        }
+
+        // Send the push notification
+        try {
+            await beamsClient.publishToUsers([external_id], {
+                web: {
+                    notification: {
+                        title: "New Message",
+                        body: `You have a new message: ${messageContent}`,
+                        deep_link: 'https://your-app.com/messages', // Adjust the link as needed
+                    },
+                },
+            });
+            console.log("Notification sent successfully");
+            return new Response(JSON.stringify({ message: "Notification sent" }), {
+                status: 200,
+                headers: { 'content-type': 'application/json' },
+            });
+        } catch (notificationError) {
+            console.error("Error sending notification:", notificationError);
+            return new Response(JSON.stringify({ message: "Error sending notification" }), {
+                status: 500,
+                headers: { 'content-type': 'application/json' },
+            });
+        }
     } catch (error) {
-        console.error("Error sending notification:", error);
-        return response.status(500).json({ message: "Internal Server Error" });
+        console.error("Error:", error);
+        return new Response(JSON.stringify({ message: "Internal Server Error" }), {
+            status: 500,
+            headers: { 'content-type': 'application/json' },
+        });
     }
 }
+
+export async function getConnecterUser(request) {
+    let token = new Headers(request.headers).get('Authorization');
+    if (!token) {
+        return null;
+    } else {
+        token = token.replace("Bearer ", "");
+    }
+    console.log("checking " + token);
+    const user = await redis.get(token);
+    if (user) {
+        console.log("Got user : " + user.username);
+    }
+    return user;
+}
+
+export function unauthorizedResponse() {
+    const error = { code: "UNAUTHORIZED", message: "Session expired" };
+    return new Response(JSON.stringify(error), {
+        status: 401,
+        headers: { 'content-type': 'application/json' },
+    });
+}
+
