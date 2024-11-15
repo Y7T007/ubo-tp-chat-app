@@ -18,6 +18,22 @@ export function loginUser(user: User, onResult: SessionCallback, onError: ErrorC
                 sessionStorage.setItem('externalId', session.externalId);
                 sessionStorage.setItem('username', session.username || "");
                 sessionStorage.setItem('id', session.id.toString());
+
+                const beamsResponse = await fetch(`/api/beams?user_id=${session.externalId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${session.token}`,
+                    },
+                });
+
+                if (beamsResponse.ok) {
+                    const beamsToken = await beamsResponse.json();
+                    sessionStorage.setItem('beamsToken', JSON.stringify(beamsToken));
+                } else {
+                    console.error("Failed to fetch beams token");
+                }
+
                 onResult(session);
             } else {
                 const error = await response.json() as CustomError;

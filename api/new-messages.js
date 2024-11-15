@@ -20,6 +20,33 @@ export default async function handler(request) {
                   AND created_on >= NOW() - INTERVAL '2 minutes'
                 ORDER BY created_on DESC
             `;
+
+            if (rowCount > 0) {
+                // Send a notification using Pusher Beams
+                const pusherResponse = await fetch("https://cbb93ff3-7b76-4414-9c3c-9a8b2d20902b.pushnotifications.pusher.com/publish_api/v1/instances/cbb93ff3-7b76-4414-9c3c-9a8b2d20902b/publishes", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${process.env.PUSHER_BEAMS_AUTH_TOKEN}`,
+                    },
+                    body: JSON.stringify({
+                        interests: [user.id.toString()],
+                        web: {
+                            notification: {
+                                title: "New Message",
+                                body: rows[0].content,
+                                icon: "https://www.univ-brest.fr/themes/custom/ubo_parent/favicon.ico",
+                                deep_link: ""
+                            }
+                        }
+                    })
+                });
+
+                if (!pusherResponse.ok) {
+                    console.error("Failed to send push notification");
+                }
+            }
+
             return new Response(JSON.stringify(rows), {
                 status: 200,
                 headers: { 'content-type': 'application/json' },

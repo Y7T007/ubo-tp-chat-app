@@ -97,14 +97,7 @@ const ChatApp = () => {
         }
     };
 
-    useEffect(() => {
-        intervalRef.current = setInterval(checkForNewMessages, 20000);
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
-        };
-    }, []);
+
     return (
         <Container
             sx={{
