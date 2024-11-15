@@ -30,8 +30,23 @@ export default async function handler(request, response) {
         const beamsToken = beamsClient.generateToken(user.externalId);
         console.log(JSON.stringify(beamsToken));
         return response.status(200).json(beamsToken);
+
     } catch (error) {
         console.error("Error generating beams token:", error);
         return response.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export async function publishNotificationToUsers(userIds, notification) {
+    try {
+        const beamsClient = new PushNotifications({
+            instanceId: process.env.PUSHER_INSTANCE_ID,
+            secretKey: process.env.PUSHER_SECRET_KEY,
+        });
+
+        const publishResponse = await beamsClient.publishToUsers(userIds, notification);
+        console.log("Just published:", publishResponse.publishId);
+    } catch (error) {
+        console.error("Error publishing notification:", error);
     }
 }
