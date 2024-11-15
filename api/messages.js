@@ -1,8 +1,8 @@
-import { getConnecterUser, unauthorizedResponse } from "../lib/session";
-import { sql } from "@vercel/postgres";
-import {publishNotificationToUsers} from "./beams";
+const { getConnecterUser, unauthorizedResponse } = require("../lib/session");
+const { sql } = require("@vercel/postgres");
+const { publishNotificationToUsers } = require("./beams");
 
-export default async function handler(request) {
+async function handler(request, response) {
     try {
         const user = await getConnecterUser(request);
         if (!user) {
@@ -75,7 +75,6 @@ export default async function handler(request) {
             };
             await publishNotificationToUsers([to], notification);
 
-
             return new Response(JSON.stringify({ message: "Message sent" }), {
                 status: 201,
                 headers: { 'content-type': 'application/json' },
@@ -94,3 +93,5 @@ export default async function handler(request) {
         });
     }
 }
+
+module.exports = handler;
