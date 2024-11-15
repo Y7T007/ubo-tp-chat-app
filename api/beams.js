@@ -1,5 +1,6 @@
-import { getConnecterUser } from '../lib/session';
 import PushNotifications from "@pusher/push-notifications-server";
+import {Redis} from "@upstash/redis";
+const redis = Redis.fromEnv();
 
 export default async function handler(request, response) {
     try {
@@ -37,16 +38,17 @@ export default async function handler(request, response) {
     }
 }
 
-export async function publishNotificationToUsers(userIds, notification) {
-    try {
-        const beamsClient = new PushNotifications({
-            instanceId: process.env.PUSHER_INSTANCE_ID,
-            secretKey: process.env.PUSHER_SECRET_KEY,
-        });
-
-        const publishResponse = await beamsClient.publishToUsers(userIds, notification);
-        console.log("Just published:", publishResponse.publishId);
-    } catch (error) {
-        console.error("Error publishing notification:", error);
+export async function getConnecterUser(request) {
+    let token = new Headers(request.headers).get('Authorization');
+    if (!token) {
+        return null;
+    } else {
+        token = token.replace("Bearer ", "");
     }
+    console.log("checking " + token);
+    const user = await redis.get(token);
+    if (user) {
+        console.log("Got user : " + user.username);
+    }
+    return user;
 }
