@@ -98,7 +98,7 @@ const ChatApp = () => {
     };
 
     useEffect(() => {
-        intervalRef.current = setInterval(checkForNewMessages, 20000);
+        intervalRef.current = setInterval(checkForNewMessages, 10000);
         return () => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
