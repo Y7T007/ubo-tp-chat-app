@@ -1,8 +1,8 @@
-import { getConnecterUser } from '../lib/session';
-import PushNotifications from "@pusher/push-notifications-server";
-import {sql} from "@vercel/postgres";
+const { getConnecterUser } = require('../lib/session');
+const PushNotifications = require("@pusher/push-notifications-server");
+const { sql } = require("@vercel/postgres");
 
-export default async function handler(request, response) {
+async function handler(request, response) {
     try {
         const user = await getConnecterUser(request);
         if (!user) {
@@ -38,7 +38,7 @@ export default async function handler(request, response) {
     }
 }
 
-export async function publishNotificationToUsers(userIds, notification) {
+async function publishNotificationToUsers(userIds, notification) {
     try {
         const beamsClient = new PushNotifications({
             instanceId: process.env.PUSHER_INSTANCE_ID,
@@ -58,4 +58,22 @@ export async function publishNotificationToUsers(userIds, notification) {
     } catch (error) {
         console.error("Error publishing notification:", error);
     }
+}
+
+module.exports = { handler, publishNotificationToUsers };
+
+if (require.main === module) {
+    // Example usage
+    const http = require('http');
+    const url = require('url');
+
+    const server = http.createServer((req, res) => {
+        const parsedUrl = url.parse(req.url, true);
+        req.query = parsedUrl.query;
+        handler(req, res);
+    });
+
+    server.listen(3000, () => {
+        console.log('Server running at http://localhost:3000/');
+    });
 }

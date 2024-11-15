@@ -1,6 +1,5 @@
 import { getConnecterUser, unauthorizedResponse } from "../lib/session";
 import { sql } from "@vercel/postgres";
-import { publishNotificationToUsers } from "./beams";
 
 export const config = {
     runtime: 'edge',
@@ -54,29 +53,6 @@ export default async function handler(request) {
                 VALUES (${user.id}, ${to}, ${content}, NOW())
             `;
 
-            const notification = {
-                apns: {
-                    aps: {
-                        alert: {
-                            title: "New Message",
-                            body: content,
-                        },
-                    },
-                },
-                fcm: {
-                    notification: {
-                        title: "New Message",
-                        body: content,
-                    },
-                },
-                web: {
-                    notification: {
-                        title: "New Message",
-                        body: content,
-                    },
-                },
-            };
-            await publishNotificationToUsers([to], notification);
 
             return new Response(JSON.stringify({ message: "Message sent" }), {
                 status: 201,
