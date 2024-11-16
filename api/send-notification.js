@@ -39,7 +39,6 @@ export default async function handler(request) {
             });
         }
 
-        // Send the push notification
         try {
             await beamsClient.publishToUsers([external_id],
             {

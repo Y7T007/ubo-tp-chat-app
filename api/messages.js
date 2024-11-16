@@ -49,7 +49,7 @@ export default async function handler(request) {
                 let token = request.headers.get('Authorization')?.replace("Bearer ", "");
                 if (!token) return null;
 
-                const notificationResponse = await fetch(`${request.headers.get('origin')}/api/send-notification`, {
+                await fetch(`${request.headers.get('origin')}/api/send-notification`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export default async function handler(request) {
                     body: JSON.stringify({ recipientId: to, messageContent: content }),
                 });
 
-                console.log("Notification request status:", notificationResponse.status);
+                console.log("Notification request status:");
             } catch (fetchError) {
                 console.error("Error sending notification request:", fetchError);
             }
