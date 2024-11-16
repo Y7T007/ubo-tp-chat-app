@@ -8,10 +8,7 @@ export const config = {
 export default async function handler(request) {
     try {
         const user = await getConnecterUser(request);
-        if (!user) {
-            console.log("Not connected");
-            return unauthorizedResponse();
-        }
+        if (!user) return unauthorizedResponse();
 
         if (request.method === "GET") {
             const toUserId = new URL(request.url).searchParams.get("toUserId");
@@ -28,18 +25,13 @@ export default async function handler(request) {
                    OR (to_user = ${toUserId} AND from_user = ${user.id})
                 ORDER BY created_on ASC
             `;
-            if (rowCount === 0) {
-                return new Response("[]", {
-                    status: 200,
-                    headers: { 'content-type': 'application/json' },
-                });
-            } else {
-                return new Response(JSON.stringify(rows), {
-                    status: 200,
-                    headers: { 'content-type': 'application/json' },
-                });
-            }
-        } else if (request.method === "POST") {
+            return new Response(JSON.stringify(rowCount === 0 ? [] : rows), {
+                status: 200,
+                headers: { 'content-type': 'application/json' },
+            });
+        }
+
+        if (request.method === "POST") {
             const { content, to } = await request.json();
             if (!content || !to) {
                 return new Response(JSON.stringify({ message: "Bad Request" }), {
@@ -54,24 +46,19 @@ export default async function handler(request) {
             `;
 
             try {
-                let token = new Headers(request.headers).get('Authorization');
-                if (!token) {
-                    return null;
-                } else {
-                    token = token.replace("Bearer ", "");
-                }
-                await fetch(`${request.headers.get('origin')}/api/send-notification`, {
+                let token = request.headers.get('Authorization')?.replace("Bearer ", "");
+                if (!token) return null;
+
+                const notificationResponse = await fetch(`${request.headers.get('origin')}/api/send-notification`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
                     },
-                    body: JSON.stringify({
-                        recipientId: to,
-                        messageContent: content,
-                    }),
+                    body: JSON.stringify({ recipientId: to, messageContent: content }),
                 });
-                console.log("Notification request sent");
+
+                console.log("Notification request status:", notificationResponse.status);
             } catch (fetchError) {
                 console.error("Error sending notification request:", fetchError);
             }
@@ -80,14 +67,14 @@ export default async function handler(request) {
                 status: 201,
                 headers: { 'content-type': 'application/json' },
             });
-        } else {
-            return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
-                status: 405,
-                headers: { 'content-type': 'application/json' },
-            });
         }
+
+        return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
+            status: 405,
+            headers: { 'content-type': 'application/json' },
+        });
     } catch (error) {
-        console.log(error);
+        console.error("Handler error:", error);
         return new Response(JSON.stringify({ message: "Internal Server Error" }), {
             status: 500,
             headers: { 'content-type': 'application/json' },

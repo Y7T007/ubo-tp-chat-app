@@ -26,9 +26,10 @@ export default async function handler(request) {
         }
         console.log(request.body.recipientId);
 
-        const {rowCount, rows} = await sql`select external_id from users where user_id=${request.body.recipientId}`;
+        const {rowCount, rows} = await sql`select external_id,username from users where user_id=${request.body.recipientId}`;
         console.log("Got " + rowCount + " users");
         const external_id=rows[0].external_id;
+        const current_username=rows[0].username;
 
         const { recipientId, messageContent } = await request.body;
         if (!external_id || !messageContent) {
@@ -40,14 +41,16 @@ export default async function handler(request) {
 
         // Send the push notification
         try {
-            await beamsClient.publishToUsers([external_id], {
+            await beamsClient.publishToUsers([external_id],
+            {
+                interests: [external_id],
                 web: {
                     notification: {
-                        title: "New Message",
-                        body: `You have a new message: ${messageContent}`,
-                        deep_link: 'https://your-app.com/messages', // Adjust the link as needed
+                        title: current_username,
+                            body: `New message: ${messageContent} `,
+                            deep_link: 'https://your-app.com/messages', // Adjust the link as needed
                     },
-                },
+                }
             });
             console.log("Notification sent successfully");
             return new Response(JSON.stringify({ message: "Notification sent" }), {
