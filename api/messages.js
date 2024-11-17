@@ -1,5 +1,8 @@
 import { getConnecterUser, unauthorizedResponse } from "../lib/session";
 import { sql } from "@vercel/postgres";
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
 
 export const config = {
     runtime: 'edge',
@@ -32,12 +35,25 @@ export default async function handler(request) {
         }
 
         if (request.method === "POST") {
-            const { content, to, imageUrl } = await request.json();
-            if ((!content && !imageUrl) || !to) {
+            const formData = await request.formData();
+            const content = formData.get("content");
+            const to = formData.get("to");
+            const image = formData.get("image");
+
+            if ((!content && !image) || !to) {
                 return new Response(JSON.stringify({ message: "Bad Request" }), {
                     status: 400,
                     headers: { 'content-type': 'application/json' },
                 });
+            }
+
+            let imageUrl = null;
+            if (image) {
+                const imageBuffer = await image.arrayBuffer();
+                const imageBase64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
+                const imageKey = `image_${Date.now()}`;
+                await redis.set(imageKey, imageBase64);
+                imageUrl = imageKey;
             }
 
             await sql`

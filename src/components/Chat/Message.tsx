@@ -1,13 +1,29 @@
-// src/components/Chat/Message.tsx
 import { ListItem, ListItemText, Box } from "@mui/material";
+import { useEffect, useState } from "react";
 
 interface MessageProps {
     user: string;
     content: string;
+    imageUrl?: string;
     isSender: boolean;
 }
 
-const Message = ({ user, content, isSender }: MessageProps) => {
+const Message = ({ user, content, imageUrl, isSender }: MessageProps) => {
+    const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchImage = async () => {
+            if (imageUrl) {
+                const response = await fetch(`/api/images?key=${imageUrl}`);
+                if (response.ok) {
+                    const imageBase64 = await response.text();
+                    setImageSrc(`data:image/jpeg;base64,${imageBase64}`);
+                }
+            }
+        };
+        fetchImage();
+    }, [imageUrl]);
+
     return (
         <ListItem sx={{ justifyContent: isSender ? "flex-end" : "flex-start" }}>
             <Box
@@ -22,6 +38,11 @@ const Message = ({ user, content, isSender }: MessageProps) => {
                 }}
             >
                 <ListItemText primary={user} secondary={content} />
+                {imageSrc && (
+                    <Box sx={{ marginTop: 1 }}>
+                        <img src={imageSrc} alt="Sent image" style={{ maxWidth: "100%", borderRadius: "10px" }} />
+                    </Box>
+                )}
             </Box>
         </ListItem>
     );

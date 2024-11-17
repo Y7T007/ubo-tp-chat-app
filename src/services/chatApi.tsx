@@ -1,7 +1,6 @@
 const getAuthHeaders = () => {
     const token = sessionStorage.getItem('token');
     return {
-        "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
     };
 };
@@ -28,16 +27,11 @@ export const getMessages = async (toUserId: number) => {
     }
 };
 
-interface SendMessageParams {
-    content: string;
-    to: number;
-}
-
-export const sendMessage = async ({ content, to }: SendMessageParams) => {
-    fetch("/api/messages", {
+export const sendMessage = async (formData: FormData) => {
+    await fetch("/api/messages", {
         method: "POST",
         headers: getAuthHeaders(),
-        body: JSON.stringify({ content, to }),
+        body: formData,
     });
 };
 

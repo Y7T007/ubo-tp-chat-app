@@ -1,13 +1,15 @@
+// src/components/Chat/ChatMessages.tsx
 import { Box, List } from "@mui/material";
 import Message from "./Message";
 import ChatInput from "./ChatInput";
 import { Component } from "react";
-import {User} from "../../model/common";
+import { User } from "../../model/common";
 
 interface MessageType {
     id: number;
     user: string;
     content: string;
+    image_url?: string;
     from_user: number;
     to_user: number;
 }
@@ -32,6 +34,7 @@ class ChatMessages extends Component<ChatMessagesProps> {
                                 key={message.id}
                                 user={message.user}
                                 content={message.content}
+                                imageUrl={message.image_url}
                                 isSender={message.from_user === currentUserId}
                             />
                         ))}
