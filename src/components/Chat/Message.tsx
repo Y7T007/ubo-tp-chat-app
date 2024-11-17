@@ -18,7 +18,7 @@ const Message = ({ user, content, imageUrl, isSender }: MessageProps) => {
                 if (response.ok) {
                     const imageBase64 = await response.text();
                     const mimeType = imageUrl.endsWith('.gif') ? 'image/gif' : 'image/jpeg';
-                    setImageSrc(`data:${mimeType};base64,${imageBase64}`);
+                    setImageSrc(`data:image/gif;base64,${imageBase64}`);
                 }
             }
         };
@@ -41,7 +41,17 @@ const Message = ({ user, content, imageUrl, isSender }: MessageProps) => {
                 <ListItemText primary={user} secondary={content} />
                 {imageSrc && (
                     <Box sx={{ marginTop: 1 }}>
-                        <img src={imageSrc} alt="" style={{maxWidth: "100%", borderRadius: "10px"}}/>
+                        <img
+                            src={imageSrc}
+                            alt=""
+                            style={{maxWidth: "100%", borderRadius: "10px"}}
+                            onLoad={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                if (target.src.endsWith('.gif')) {
+                                    target.setAttribute('loop', '');
+                                }
+                            }}
+                        />
                     </Box>
                 )}
             </Box>
