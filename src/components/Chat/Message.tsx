@@ -17,7 +17,8 @@ const Message = ({ user, content, imageUrl, isSender }: MessageProps) => {
                 const response = await fetch(`/api/images?key=${imageUrl}`);
                 if (response.ok) {
                     const imageBase64 = await response.text();
-                    setImageSrc(`data:image/jpeg;base64,${imageBase64}`);
+                    const mimeType = imageUrl.endsWith('.gif') ? 'image/gif' : 'image/jpeg';
+                    setImageSrc(`data:${mimeType};base64,${imageBase64}`);
                 }
             }
         };

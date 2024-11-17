@@ -2,7 +2,7 @@ import { Box, TextField, Button, IconButton } from "@mui/material";
 import { useState } from "react";
 import { sendMessage } from "../../services/chatApi";
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
-import gifshot from 'gifshot';
+import gifshot, { CreateGIFOptions, CreateGIFResult } from 'gifshot';
 
 interface User {
     user_id: number;
@@ -82,7 +82,7 @@ const ChatInput = ({ selectedUser, onMessageSent }: ChatInputProps) => {
                 numFrames: 10,
                 sampleInterval: 10,
                 numWorkers: 2
-            }, (obj) => {
+            } as CreateGIFOptions, (obj: CreateGIFResult) => {
                 if (!obj.error) {
                     const image = new Image();
                     image.src = obj.image;
@@ -127,7 +127,7 @@ const ChatInput = ({ selectedUser, onMessageSent }: ChatInputProps) => {
             </Button>
             {thumbnail && (
                 <Box sx={{ marginLeft: 2 }}>
-                    <img src={thumbnail} alt="Thumbnail" style={{ maxWidth: "100px", borderRadius: "10px" }} />
+                    <img src={thumbnail} style={{ maxWidth: "100px", borderRadius: "10px" }} />
                 </Box>
             )}
         </Box>
