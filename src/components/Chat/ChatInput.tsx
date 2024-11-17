@@ -127,7 +127,7 @@ const ChatInput = ({ selectedUser, onMessageSent }: ChatInputProps) => {
             </Button>
             {thumbnail && (
                 <Box sx={{ marginLeft: 2 }}>
-                    <img src={thumbnail} style={{ maxWidth: "100px", borderRadius: "10px" }} />
+                    <img src={thumbnail} alt="Thumbnail" style={{ maxWidth: "100px", borderRadius: "10px" }} />
                 </Box>
             )}
         </Box>
