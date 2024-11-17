@@ -34,14 +34,11 @@ interface SendMessageParams {
 }
 
 export const sendMessage = async ({ content, to }: SendMessageParams) => {
-    const response = await fetch("/api/messages", {
+    fetch("/api/messages", {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({ content, to }),
     });
-    if (!response.ok) {
-        throw new Error("Failed to send message");
-    }
 };
 
 export const checkSession = async (): Promise<boolean> => {

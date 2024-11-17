@@ -1,8 +1,9 @@
-const { getConnecterUser } = require('../lib/session');
-const PushNotifications = require("@pusher/push-notifications-server");
-const { sql } = require("@vercel/postgres");
+import PushNotifications from "@pusher/push-notifications-server";
+import {Redis} from "@upstash/redis";
+const redis = Redis.fromEnv();
 
-async function handler(request, response) {
+export default async function handler(request, response) {
+
     try {
         const user = await getConnecterUser(request);
         if (!user) {
@@ -38,40 +39,17 @@ async function handler(request, response) {
     }
 }
 
-async function publishNotificationToUsers(userIds, notification) {
-    try {
-        const beamsClient = new PushNotifications({
-            instanceId: process.env.PUSHER_INSTANCE_ID,
-            secretKey: process.env.PUSHER_SECRET_KEY,
-        });
-
-        const externalIds = [];
-        for (const userId of userIds) {
-            const { rows } = await sql`SELECT external_id FROM users WHERE user_id = ${userId}`;
-            if (rows.length > 0) {
-                externalIds.push(rows[0].external_id);
-            }
-        }
-
-        const publishResponse = await beamsClient.publishToUsers(externalIds, notification);
-        console.log("Just published:", publishResponse.publishId);
-    } catch (error) {
-        console.error("Error publishing notification:", error);
+export async function getConnecterUser(request) {
+    let token = new Headers(request.headers).get('Authorization');
+    if (!token) {
+        return null;
+    } else {
+        token = token.replace("Bearer ", "");
     }
-}
-
-if (require.main === module) {
-    // Example usage
-    const http = require('http');
-    const url = require('url');
-
-    const server = http.createServer((req, res) => {
-        const parsedUrl = url.parse(req.url, true);
-        req.query = parsedUrl.query;
-        handler(req, res);
-    });
-
-    server.listen(3000, () => {
-        console.log('Server running at http://localhost:3000/');
-    });
+    console.log("checking " + token);
+    const user = await redis.get(token);
+    if (user) {
+        console.log("Got user : " + user.username);
+    }
+    return user;
 }

@@ -5,10 +5,7 @@ const { publishNotificationToUsers } = require("./beams");
 async function handler(request, response) {
     try {
         const user = await getConnecterUser(request);
-        if (!user) {
-            console.log("Not connected");
-            return unauthorizedResponse();
-        }
+        if (!user) return unauthorizedResponse();
 
         if (request.method === "GET") {
             const toUserId = new URL(request.url).searchParams.get("toUserId");
@@ -25,18 +22,13 @@ async function handler(request, response) {
                    OR (to_user = ${toUserId} AND from_user = ${user.id})
                 ORDER BY created_on ASC
             `;
-            if (rowCount === 0) {
-                return new Response("[]", {
-                    status: 200,
-                    headers: { 'content-type': 'application/json' },
-                });
-            } else {
-                return new Response(JSON.stringify(rows), {
-                    status: 200,
-                    headers: { 'content-type': 'application/json' },
-                });
-            }
-        } else if (request.method === "POST") {
+            return new Response(JSON.stringify(rowCount === 0 ? [] : rows), {
+                status: 200,
+                headers: { 'content-type': 'application/json' },
+            });
+        }
+
+        if (request.method === "POST") {
             const { content, to } = await request.json();
             if (!content || !to) {
                 return new Response(JSON.stringify({ message: "Bad Request" }), {
@@ -50,48 +42,40 @@ async function handler(request, response) {
                 VALUES (${user.id}, ${to}, ${content}, NOW())
             `;
 
-            // Send notification to the recipient user
-            const notification = {
-                apns: {
-                    aps: {
-                        alert: {
-                            title: "New Message",
-                            body: content,
-                        },
+            try {
+                let token = request.headers.get('Authorization')?.replace("Bearer ", "");
+                if (!token) return null;
+
+                await fetch(`${request.headers.get('origin')}/api/send-notification`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
                     },
-                },
-                fcm: {
-                    notification: {
-                        title: "New Message",
-                        body: content,
-                    },
-                },
-                web: {
-                    notification: {
-                        title: "New Message",
-                        body: content,
-                    },
-                },
-            };
-            await publishNotificationToUsers([to], notification);
+                    body: JSON.stringify({ recipientId: to, messageContent: content }),
+                });
+
+                console.log("Notification request status:");
+            } catch (fetchError) {
+                console.error("Error sending notification request:", fetchError);
+            }
+
 
             return new Response(JSON.stringify({ message: "Message sent" }), {
                 status: 201,
                 headers: { 'content-type': 'application/json' },
             });
-        } else {
-            return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
-                status: 405,
-                headers: { 'content-type': 'application/json' },
-            });
         }
+
+        return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
+            status: 405,
+            headers: { 'content-type': 'application/json' },
+        });
     } catch (error) {
-        console.log(error);
+        console.error("Handler error:", error);
         return new Response(JSON.stringify({ message: "Internal Server Error" }), {
             status: 500,
             headers: { 'content-type': 'application/json' },
         });
     }
 }
-
-module.exports = handler;
