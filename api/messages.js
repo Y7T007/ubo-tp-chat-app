@@ -32,8 +32,8 @@ export default async function handler(request) {
         }
 
         if (request.method === "POST") {
-            const { content, to } = await request.json();
-            if (!content || !to) {
+            const { content, to, imageUrl } = await request.json();
+            if ((!content && !imageUrl) || !to) {
                 return new Response(JSON.stringify({ message: "Bad Request" }), {
                     status: 400,
                     headers: { 'content-type': 'application/json' },
@@ -41,8 +41,8 @@ export default async function handler(request) {
             }
 
             await sql`
-                INSERT INTO messages (from_user, to_user, content, created_on)
-                VALUES (${user.id}, ${to}, ${content}, NOW())
+                INSERT INTO messages (from_user, to_user, content, image_url, created_on)
+                VALUES (${user.id}, ${to}, ${content}, ${imageUrl}, NOW())
             `;
 
             try {
@@ -55,7 +55,7 @@ export default async function handler(request) {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ recipientId: to, messageContent: content }),
+                    body: JSON.stringify({ recipientId: to, messageContent: content || "Image" }),
                 });
 
                 console.log("Notification request status:");
