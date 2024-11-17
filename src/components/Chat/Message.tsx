@@ -41,7 +41,8 @@ const Message = ({ user, content, imageUrl, isSender }: MessageProps) => {
                 <ListItemText primary={user} secondary={content} />
                 {imageSrc && (
                     <Box sx={{ marginTop: 1 }}>
-                    <img src={imageSrc} style={{ maxWidth: "100%", borderRadius: "10px" }} />                    </Box>
+                        <img src={imageSrc} alt="" style={{maxWidth: "100%", borderRadius: "10px"}}/>
+                    </Box>
                 )}
             </Box>
         </ListItem>
