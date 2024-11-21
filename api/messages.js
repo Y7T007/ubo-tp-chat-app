@@ -38,7 +38,7 @@ export default async function handler(request) {
             const to = formData.get("to");
             const image = formData.get("image");
 
-            if ((!content && !image) || !to) {
+            if (!content && !image) {
                 return new Response(JSON.stringify({ message: "Bad Request" }), {
                     status: 400,
                     headers: { 'content-type': 'application/json' },

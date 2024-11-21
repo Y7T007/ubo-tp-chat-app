@@ -19,12 +19,14 @@ const ChatInput = ({ selectedUser, onMessageSent }: ChatInputProps) => {
     const [thumbnail, setThumbnail] = useState<string | null>(null);
 
     const handleSend = async () => {
-        if (gif && selectedUser) {
+        if (selectedUser) {
             const formData = new FormData();
             formData.append("content", message);
             formData.append("to", selectedUser.user_id.toString());
-            formData.append("image", gif);
-            sendMessage(formData);
+            if (gif) {
+                formData.append("image", gif);
+            }
+            await sendMessage(formData);
             setMessage("");
             setGif(null);
             setThumbnail(null);
@@ -64,7 +66,7 @@ const ChatInput = ({ selectedUser, onMessageSent }: ChatInputProps) => {
                     <PhotoCamera />
                 </IconButton>
             </label>
-            <Button variant="contained" color="primary" onClick={handleSend} disabled={!selectedUser || !gif}>
+            <Button variant="contained" color="primary" onClick={handleSend} disabled={!selectedUser || (!message && !gif)}>
                 Send
             </Button>
             {thumbnail && (
