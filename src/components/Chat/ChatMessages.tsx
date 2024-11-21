@@ -1,8 +1,7 @@
-// src/components/Chat/ChatMessages.tsx
 import { Box, List } from "@mui/material";
 import Message from "./Message";
 import ChatInput from "./ChatInput";
-import { Component } from "react";
+import React, { Component } from "react";
 import { User } from "../../model/common";
 
 interface MessageType {
@@ -21,13 +20,51 @@ interface ChatMessagesProps {
 }
 
 class ChatMessages extends Component<ChatMessagesProps> {
+    messagesEndRef: React.RefObject<HTMLDivElement>;
+    messagesContainerRef: React.RefObject<HTMLDivElement>;
+    isUserScrolledUp: boolean;
+
+    constructor(props: ChatMessagesProps) {
+        super(props);
+        this.messagesEndRef = React.createRef();
+        this.messagesContainerRef = React.createRef();
+        this.isUserScrolledUp = false;
+    }
+
+    componentDidMount() {
+        this.scrollToBottom();
+    }
+
+    componentDidUpdate(prevProps: ChatMessagesProps) {
+        if (prevProps.messages.length !== this.props.messages.length && !this.isUserScrolledUp) {
+            this.scrollToBottom();
+        }
+    }
+
+    scrollToBottom = () => {
+        if (this.messagesEndRef.current) {
+            this.messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
+    };
+
+    handleScroll = () => {
+        if (this.messagesContainerRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = this.messagesContainerRef.current;
+            this.isUserScrolledUp = scrollTop + clientHeight < scrollHeight;
+        }
+    };
+
     render() {
         const { messages, selectedUser, onMessageSent } = this.props;
         const currentUserId = parseInt(sessionStorage.getItem("id") || "0");
 
         return (
-            <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
+            <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+                <Box
+                    sx={{ flex: 1, overflowY: "auto", padding: 2 }}
+                    ref={this.messagesContainerRef}
+                    onScroll={this.handleScroll}
+                >
                     <List>
                         {messages.map((message: MessageType) => (
                             <Message
@@ -38,6 +75,7 @@ class ChatMessages extends Component<ChatMessagesProps> {
                                 isSender={message.from_user === currentUserId}
                             />
                         ))}
+                        <div ref={this.messagesEndRef} />
                     </List>
                 </Box>
                 <ChatInput selectedUser={selectedUser} onMessageSent={onMessageSent} />
