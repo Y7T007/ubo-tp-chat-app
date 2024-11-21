@@ -1,4 +1,4 @@
-import { Box, List } from "@mui/material";
+import { Box, List, Typography } from "@mui/material";
 import Message from "./Message";
 import ChatInput from "./ChatInput";
 import React, { Component } from "react";
@@ -59,27 +59,36 @@ class ChatMessages extends Component<ChatMessagesProps> {
         const currentUserId = parseInt(sessionStorage.getItem("id") || "0");
 
         return (
-            <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-                <Box
-                    sx={{ flex: 1, overflowY: "auto", padding: 2 }}
-                    ref={this.messagesContainerRef}
-                    onScroll={this.handleScroll}
-                >
-                    <List>
-                        {messages.map((message: MessageType) => (
-                            <Message
-                                key={message.id}
-                                user={message.user}
-                                content={message.content}
-                                imageUrl={message.image_url}
-                                isSender={message.from_user === currentUserId}
-                            />
-                        ))}
-                        <div ref={this.messagesEndRef} />
-                    </List>
+            <>
+            {selectedUser ? (
+                    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+                        <Box
+                            sx={{ flex: 1, overflowY: "auto", padding: 2 }}
+                            ref={this.messagesContainerRef}
+                            onScroll={this.handleScroll}
+                        >
+                            <List>
+                                {messages.map((message: MessageType) => (
+                                    <Message
+                                        key={message.id}
+                                        user={message.user}
+                                        content={message.content}
+                                        imageUrl={message.image_url}
+                                        isSender={message.from_user === currentUserId}
+                                    />
+                                ))}
+                                <div ref={this.messagesEndRef} />
+                            </List>
+                        </Box>
+                        <ChatInput selectedUser={selectedUser} onMessageSent={onMessageSent} />
                     </Box>
-                <ChatInput selectedUser={selectedUser} onMessageSent={onMessageSent} />
-            </Box>
+                ) : (
+                    <Typography variant="h6" align="center" sx={{ marginTop: 2 }}>
+                        Please select a user to start chatting.
+                    </Typography>
+                )}
+            </>
+
         );
     }
 }

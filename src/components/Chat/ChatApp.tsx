@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Container, Box } from "@mui/joy";
 import { useNavigate } from "react-router-dom";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
@@ -7,8 +6,12 @@ import GroupChat from "../Group/GroupChat";
 import Sidebar from "../SideBar/SideBar";
 import { getUsers, getMessages, checkSession } from "../../services/chatApi";
 import { User, Room } from "../../model/common";
-import GlobalStyles from "@mui/joy/GlobalStyles";
 import * as React from "react";
+import {List} from "@mui/material";
+import Message from "./Message";
+import ChatInput from "./ChatInput";
+import { Container, Box, Typography, GlobalStyles } from '@mui/joy';
+
 
 const ChatApp = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -131,7 +134,10 @@ const ChatApp = () => {
                 height: '100vh',
                 maxWidth: '100% !important', // Add this line
                 backgroundImage: 'url(https://images.unsplash.com/photo-1527181152855-fc03fc7949c8?auto=format&w=1000&dpr=2)',
-            }}>
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }}
+        >
             <GlobalStyles
                 styles={{
                     ':root': {
@@ -140,26 +146,62 @@ const ChatApp = () => {
                 }}
             />
             <Sidebar users={users} onSelectUser={handleSelectUser} onSelectRoom={handleSelectRoom} />
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flex: 1,
-                    height: '100%',
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    borderRadius: '25px',
-                    backdropFilter: 'blur(12px)',
-                    marginLeft: 2,
-                }}>
-                <ChatHeader selectedUserName={selectedUserName} onRefresh={refreshMessages} />
-                <Box sx={{ flex: 1, overflowY: 'auto' }}>
-                    {selectedRoom ? (
-                        <GroupChat selectedRoom={selectedRoom} />
-                    ) : (
-                        <ChatMessages messages={messages} selectedUser={selectedUser} onMessageSent={handleMessageSent} />
-                    )}
-                </Box>
-            </Box>
+            <>
+                {selectedUser ? (
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            flex: 1,
+                            height: '100%',
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderRadius: '25px',
+                            backdropFilter: 'blur(12px)',
+                            marginLeft: 2,
+                        }}
+                    >
+                        <ChatHeader selectedUserName={selectedUserName} onRefresh={refreshMessages} />
+                        <Box sx={{ flex: 1, overflowY: 'auto' }}>
+                            {selectedRoom ? (
+                                <GroupChat selectedRoom={selectedRoom} />
+                            ) : (
+                                <ChatMessages messages={messages} selectedUser={selectedUser} onMessageSent={handleMessageSent} />
+                            )}
+                        </Box>
+                    </Box>
+                ) : (
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%',
+                            height: '100%',
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                backgroundColor: 'rgba(255,255,255,0.3)',
+                                borderRadius: '16px',
+                                backdropFilter: 'blur(10px)',
+                                padding: 3,
+                                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+                                textAlign: 'center',
+                                maxWidth: '400px',
+                            }}
+                        >
+                            <Typography level="h2" sx={{ marginBottom: 1 }}>
+                                📨 Start Chatting !!
+                            </Typography>
+                            <Typography level="h4">
+                                Please select a user to start chatting.
+                            </Typography>
+                        </Box>
+
+                    </Box>
+                )}
+            </>
         </Container>
     );
 };
