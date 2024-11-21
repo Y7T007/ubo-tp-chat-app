@@ -14,11 +14,11 @@ const Message = ({ user, content, imageUrl, isSender }: MessageProps) => {
     useEffect(() => {
         const fetchImage = async () => {
             if (imageUrl) {
-                const response = await fetch(`/api/images?key=${imageUrl}`);
+                const response = await fetch(imageUrl);
                 if (response.ok) {
-                    const imageBase64 = await response.text();
-                    const mimeType = imageUrl.endsWith('.gif') ? 'image/gif' : 'image/jpeg';
-                    setImageSrc(`data:image/gif;base64,${imageBase64}`);
+                    const blob = await response.blob();
+                    const imageObjectURL = URL.createObjectURL(blob);
+                    setImageSrc(imageObjectURL);
                 }
             }
         };
@@ -44,13 +44,7 @@ const Message = ({ user, content, imageUrl, isSender }: MessageProps) => {
                         <img
                             src={imageSrc}
                             alt=""
-                            style={{maxWidth: "100%", borderRadius: "10px"}}
-                            onLoad={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                if (target.src.endsWith('.gif')) {
-                                    target.setAttribute('loop', '');
-                                }
-                            }}
+                            style={{ maxWidth: "100%", borderRadius: "10px" }}
                         />
                     </Box>
                 )}
