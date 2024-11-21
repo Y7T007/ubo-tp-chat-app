@@ -39,6 +39,7 @@ const ChatInput = ({ selectedUser, onMessageSent }: ChatInputProps) => {
             }
         }
     };
+
     const handleGifChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             const file = event.target.files[0];
@@ -50,7 +51,16 @@ const ChatInput = ({ selectedUser, onMessageSent }: ChatInputProps) => {
     };
 
     return (
-        <Box sx={{ display: "flex", padding: 2 }}>
+        <Box
+            sx={{
+                display: "flex",
+                padding: 2,
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '25px',
+                backdropFilter: 'blur(12px)',
+                marginTop: 2,
+            }}
+        >
             <TextField
                 fullWidth
                 variant="outlined"

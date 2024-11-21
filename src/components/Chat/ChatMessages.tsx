@@ -77,7 +77,7 @@ class ChatMessages extends Component<ChatMessagesProps> {
                         ))}
                         <div ref={this.messagesEndRef} />
                     </List>
-                </Box>
+                    </Box>
                 <ChatInput selectedUser={selectedUser} onMessageSent={onMessageSent} />
             </Box>
         );

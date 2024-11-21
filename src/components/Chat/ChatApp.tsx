@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import { Container, Box } from "@mui/joy";
 import { useNavigate } from "react-router-dom";
 import ChatHeader from "./ChatHeader";
@@ -123,42 +123,40 @@ const ChatApp = () => {
         }
     };
 
-
     return (
         <Container
             sx={{
+                display: 'flex',
+                width: '100vw',
+                height: '100vh',
+                maxWidth: '100% !important', // Add this line
                 backgroundImage: 'url(https://images.unsplash.com/photo-1527181152855-fc03fc7949c8?auto=format&w=1000&dpr=2)',
             }}>
             <GlobalStyles
                 styles={{
                     ':root': {
-                        '--Form-maxWidth': '800px',
                         '--Transition-duration': '0.4s',
                     },
                 }}
             />
+            <Sidebar users={users} onSelectUser={handleSelectUser} onSelectRoom={handleSelectRoom} />
             <Box
-                sx={(theme) => ({
-                    width: { xs: '100%', md: '50vw' },
-                    transition: 'width var(--Transition-duration)',
-                    transitionDelay: 'calc(var(--Transition-duration) + 0.1s)',
-                    position: 'relative',
-                    zIndex: 1,
+                sx={{
                     display: 'flex',
-                    justifyContent: 'flex-end',
-                })}>
-                <Box sx={{ display: "flex", flex: 1 }}>
-                    <Sidebar users={users} onSelectUser={handleSelectUser} onSelectRoom={handleSelectRoom} />
+                    flexDirection: 'column',
+                    flex: 1,
+                    height: '100%',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '25px',
+                    backdropFilter: 'blur(12px)',
+                    marginLeft: 2,
+                }}>
+                <ChatHeader selectedUserName={selectedUserName} onRefresh={refreshMessages} />
+                <Box sx={{ flex: 1, overflowY: 'auto' }}>
                     {selectedRoom ? (
-                        <Box sx={{ display: "flex", flexDirection: "column"}}>
-                            <ChatHeader selectedUserName={selectedUserName} onRefresh={refreshMessages} />
-                            <GroupChat selectedRoom={selectedRoom} />
-                        </Box>
+                        <GroupChat selectedRoom={selectedRoom} />
                     ) : (
-                        <Box sx={{ display: "flex", flexDirection: "column"}}>
-                            <ChatHeader selectedUserName={selectedUserName} onRefresh={refreshMessages} />
-                            <ChatMessages messages={messages} selectedUser={selectedUser} onMessageSent={handleMessageSent} />
-                        </Box>
+                        <ChatMessages messages={messages} selectedUser={selectedUser} onMessageSent={handleMessageSent} />
                     )}
                 </Box>
             </Box>
