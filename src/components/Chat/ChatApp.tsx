@@ -83,6 +83,23 @@ const ChatApp = () => {
         };
     };
 
+    const refreshMessages = async () => {
+        if (selectedUser) {
+            const messages = await getMessages(selectedUser.user_id);
+            setMessages(messages);
+        }
+    };
+
+    useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                const payload = event.data;
+                console.log("Received notification:", payload);
+                refreshMessages();
+            });
+        }
+    }, [selectedUser]);
+
     const checkForNewMessages = async () => {
         try {
             const response = await fetch("/api/new-messages", {
@@ -134,12 +151,12 @@ const ChatApp = () => {
                     <Sidebar users={users} onSelectUser={handleSelectUser} onSelectRoom={handleSelectRoom} />
                     {selectedRoom ? (
                         <Box sx={{ display: "flex", flexDirection: "column"}}>
-                            <ChatHeader selectedUserName={selectedUserName} />
+                            <ChatHeader selectedUserName={selectedUserName} onRefresh={refreshMessages} />
                             <GroupChat selectedRoom={selectedRoom} />
                         </Box>
                     ) : (
                         <Box sx={{ display: "flex", flexDirection: "column"}}>
-                            <ChatHeader selectedUserName={selectedUserName} />
+                            <ChatHeader selectedUserName={selectedUserName} onRefresh={refreshMessages} />
                             <ChatMessages messages={messages} selectedUser={selectedUser} onMessageSent={handleMessageSent} />
                         </Box>
                     )}

@@ -1,10 +1,12 @@
-import { AppBar, Toolbar, Typography } from "@mui/material";
+import { AppBar, Toolbar, Typography, IconButton } from "@mui/material";
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 interface ChatHeaderProps {
     selectedUserName: string;
+    onRefresh: () => void;
 }
 
-const ChatHeader = ({ selectedUserName }: ChatHeaderProps) => {
+const ChatHeader = ({ selectedUserName, onRefresh }: ChatHeaderProps) => {
     return (
         <AppBar position="static">
             <Toolbar>
@@ -14,6 +16,9 @@ const ChatHeader = ({ selectedUserName }: ChatHeaderProps) => {
                         Chatting with {selectedUserName}
                     </Typography>
                 )}
+                <IconButton color="inherit" onClick={onRefresh}>
+                    <RefreshIcon />
+                </IconButton>
             </Toolbar>
         </AppBar>
     );

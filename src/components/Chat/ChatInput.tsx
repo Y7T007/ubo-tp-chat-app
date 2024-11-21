@@ -26,14 +26,19 @@ const ChatInput = ({ selectedUser, onMessageSent }: ChatInputProps) => {
             if (gif) {
                 formData.append("image", gif);
             }
-            await sendMessage(formData);
-            setMessage("");
-            setGif(null);
-            setThumbnail(null);
-            onMessageSent();
+            try {
+                sendMessage(formData);
+                setTimeout(() => {
+                    setMessage("");
+                    setGif(null);
+                    setThumbnail(null);
+                    onMessageSent();
+                }, 1000);
+            } catch (error) {
+                console.error("Error sending message:", error);
+            }
         }
     };
-
     const handleGifChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             const file = event.target.files[0];
