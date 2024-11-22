@@ -11,6 +11,7 @@ interface MessageType {
     image_url?: string;
     from_user: number;
     to_user: number;
+    created_on: string;
 }
 
 interface ChatMessagesProps {
@@ -61,7 +62,7 @@ class ChatMessages extends Component<ChatMessagesProps> {
         return (
             <>
             {selectedUser ? (
-                    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+                    <Box sx={{ height: "90vh", display: "flex", flexDirection: "column" }}>
                         <Box
                             sx={{ flex: 1, overflowY: "auto", padding: 2 }}
                             ref={this.messagesContainerRef}
@@ -75,6 +76,7 @@ class ChatMessages extends Component<ChatMessagesProps> {
                                         content={message.content}
                                         imageUrl={message.image_url}
                                         isSender={message.from_user === currentUserId}
+                                        timestamp={message.created_on} // Pass timestamp prop
                                     />
                                 ))}
                                 <div ref={this.messagesEndRef} />

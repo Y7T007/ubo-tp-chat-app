@@ -2,7 +2,7 @@ import { Box, Collapse, List, ListItemButton, ListItemText, Divider, TextField, 
 import { useState } from "react";
 import UserList from "../User/UserList";
 import GroupList from "../Group/GroupList";
-import {User, Room, Session} from "../../model/common";
+import { User, Room } from "../../model/common";
 import IconButton from "@mui/joy/IconButton";
 import Typography from "@mui/joy/Typography";
 import * as React from "react";
@@ -43,6 +43,7 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom }: SidebarProps) => {
             backgroundColor: "rgba(255, 255, 255, 0.2)",
             paddingLeft: 2,
             paddingRight: 2,
+            color: "black", // Ensure text color is black
         }}>
             <GlobalStyles
                 styles={{
@@ -96,11 +97,12 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom }: SidebarProps) => {
                         sx={{
                             backgroundColor: "rgba(255,255,255,0.1)",
                             borderRadius: "15px",
+                            color: "black", // Ensure text color is black
                         }}
                     />
                 </Box>
                 <Box sx={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
-                    <ListItemButton onClick={() => setOpenUsers(!openUsers)} sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderRadius: "15px", mb: 1 }}>
+                    <ListItemButton onClick={() => setOpenUsers(!openUsers)} sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderRadius: "15px", mb: 1, color: "black" }}>
                         <PeopleIcon sx={{ mr: 1 }} />
                         <ListItemText primary="Users" />
                     </ListItemButton>
@@ -108,7 +110,7 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom }: SidebarProps) => {
                         <UserList users={filteredUsers} onSelectUser={onSelectUser} />
                     </Collapse>
                     <Divider />
-                    <ListItemButton onClick={() => setOpenGroups(!openGroups)} sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderRadius: "15px", mb: 1 }}>
+                    <ListItemButton onClick={() => setOpenGroups(!openGroups)} sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderRadius: "15px", mb: 1, color: "black" }}>
                         <GroupIcon sx={{ mr: 1 }} />
                         <ListItemText primary="Groups" />
                     </ListItemButton>
@@ -119,7 +121,7 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom }: SidebarProps) => {
                 </Box>
             </List>
             <Box sx={{ mt: "auto", p: 2 }}>
-                <ListItemButton onClick={handleLogout} sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderRadius: "15px" }}>
+                <ListItemButton onClick={handleLogout} sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderRadius: "15px", color: "black" }}>
                     <ExitToAppIcon sx={{ mr: 1 }} />
                     <ListItemText primary="Logout" />
                 </ListItemButton>

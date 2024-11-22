@@ -1,14 +1,16 @@
-import { ListItem, ListItemText, Box } from "@mui/material";
 import { useEffect, useState } from "react";
+import { format } from "date-fns";
 
 interface MessageProps {
     user: string;
     content: string;
     imageUrl?: string;
     isSender: boolean;
+    timestamp: string;
+    footerText?: string;
 }
 
-const Message = ({ user, content, imageUrl, isSender }: MessageProps) => {
+const Message = ({ user, content, imageUrl, isSender, timestamp, footerText }: MessageProps) => {
     const [imageSrc, setImageSrc] = useState<string | null>(null);
 
     useEffect(() => {
@@ -25,31 +27,26 @@ const Message = ({ user, content, imageUrl, isSender }: MessageProps) => {
         fetchImage();
     }, [imageUrl]);
 
+    const formattedTimestamp = format(new Date(timestamp), "h:mm a");
+
     return (
-        <ListItem sx={{ justifyContent: isSender ? "flex-end" : "flex-start" }}>
-            <Box
-                sx={{
-                    backgroundColor: isSender ? "#DCF8C6" : "#FFFFFF",
-                    borderRadius: "10px",
-                    padding: "10px",
-                    maxWidth: "60%",
-                    alignSelf: isSender ? "flex-end" : "flex-start",
-                    color: isSender ? "#000000" : "blueviolet",
-                    boxShadow: 1,
-                }}
-            >
-                <ListItemText primary={user} secondary={content} />
+        <div className={`chat ${isSender ? "chat-end" : "chat-start"}`}>
+            <div className="chat-bubble min-w-2.5">
                 {imageSrc && (
-                    <Box sx={{ marginTop: 1 }}>
-                        <img
-                            src={imageSrc}
-                            alt=""
-                            style={{ maxWidth: "100%", borderRadius: "10px" }}
-                        />
-                    </Box>
+                    <div className="chat-image avatar mb-2">
+                        <div className="w-10 rounded-full">
+                            <img alt="User avatar" src={imageSrc} />
+                        </div>
+                    </div>
                 )}
-            </Box>
-        </ListItem>
+                <div className="text-white">{content}</div>
+                <div className="chat-header text-white bg-gray-800 p-2 rounded-t-lg">
+                    {user}
+                    <time className="text-xs opacity-50">{formattedTimestamp}</time>
+                </div>
+                {footerText && <div className="chat-footer text-gray-400 opacity-50">{footerText}</div>}
+            </div>
+        </div>
     );
 };
 

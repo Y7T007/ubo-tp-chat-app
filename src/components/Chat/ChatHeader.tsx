@@ -21,7 +21,7 @@ const ChatHeader = ({ selectedUserName, onRefresh }: ChatHeaderProps) => {
             }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Avatar sx={{ marginRight: 2 }}>U</Avatar>
-                <Typography variant="h6">{selectedUserName}</Typography>
+                <Typography variant="h6" sx={{ color: 'black' }}>{selectedUserName}</Typography>
             </Box>
             <IconButton color="inherit" onClick={onRefresh}>
                 <RefreshIcon />

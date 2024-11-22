@@ -10,7 +10,8 @@ import * as React from "react";
 import {List} from "@mui/material";
 import Message from "./Message";
 import ChatInput from "./ChatInput";
-import { Container, Box, Typography, GlobalStyles } from '@mui/joy';
+import { Container, Box, Typography } from '@mui/joy';
+import { GlobalStyles } from '@mui/joy';
 
 
 const ChatApp = () => {
@@ -191,12 +192,19 @@ const ChatApp = () => {
                                 maxWidth: '400px',
                             }}
                         >
-                            <Typography level="h2" sx={{ marginBottom: 1 }}>
+                            <Typography
+                                level="h2"
+                                sx={{ marginBottom: 1, fontFamily: 'Poppins, sans-serif !important' }}
+                            >
                                 📨 Start Chatting !!
                             </Typography>
-                            <Typography level="h4">
+                            <Typography
+                                level="h4"
+                                sx={{ fontFamily: 'Poppins, sans-serif !important' }}
+                            >
                                 Please select a user to start chatting.
                             </Typography>
+
                         </Box>
 
                     </Box>
