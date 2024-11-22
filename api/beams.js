@@ -3,6 +3,7 @@ import {Redis} from "@upstash/redis";
 const redis = Redis.fromEnv();
 
 export default async function handler(request, response) {
+
     try {
         const user = await getConnecterUser(request);
         if (!user) {
