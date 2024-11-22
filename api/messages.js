@@ -1,8 +1,12 @@
-import { getConnecterUser, unauthorizedResponse } from "../lib/session";
-import { sql } from "@vercel/postgres";
+const { getConnecterUser, unauthorizedResponse } = require("../lib/session");
+
+const { sql } = require("@vercel/postgres");
 import { put } from "@vercel/blob";
+const { publishNotificationToUsers } = require("./beams");
 
 
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function handler(request, response) {
     try {
         const user = await getConnecterUser(request);
