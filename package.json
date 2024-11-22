@@ -67,6 +67,6 @@
     "eslint-plugin-jsx": "^0.1.0",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-react": "^7.31.10",
-    "react-snap": "^1.23.0",
+    "react-snap": "^1.23.0"
   }
 }
