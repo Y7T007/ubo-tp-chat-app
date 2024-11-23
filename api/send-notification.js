@@ -22,8 +22,8 @@ export default async function handler(request) {
             });
         }
 
-        const { recipientId, messageContent } = await request.body;
-        if (!recipientId || !messageContent) {
+        const { recipientId, messageContent, senderUsername } = await request.body;
+        if (!recipientId || !messageContent || !senderUsername) {
             return new Response(JSON.stringify({ message: "Bad Request" }), {
                 status: 400,
                 headers: { 'content-type': 'application/json' },
@@ -35,9 +35,9 @@ export default async function handler(request) {
                 interests: [recipientId],
                 web: {
                     notification: {
-                        title: "New Message",
+                        title: `New Message from ${senderUsername}`,
                         body: `New message: ${messageContent}`,
-                        deep_link: 'https://your-app.com/messages',
+                        deep_link: 'https://ubo-tp-chat-app.vercel.app/chat',
                     },
                 }
             });
