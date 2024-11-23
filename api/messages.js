@@ -46,8 +46,6 @@ export default async function handler(request, response) {
                 });
 
                 const uploadResponseText = await uploadResponse.text();
-                console.log("Upload response text:", uploadResponseText);
-
                 const uploadResult = JSON.parse(uploadResponseText);
                 imageUrl = uploadResult.imageUrl;
             }
@@ -70,7 +68,6 @@ export default async function handler(request, response) {
                     body: JSON.stringify({ recipientId: to, messageContent: content || "Image" }),
                 });
 
-                console.log("Notification request status:");
             } catch (fetchError) {
                 console.error("Error sending notification request:", fetchError);
             }

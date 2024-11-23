@@ -22,7 +22,6 @@ export default async function handler(request) {
             `;
 
             if (rowCount > 0) {
-                // Send a notification using Pusher Beams
                 const pusherResponse = await fetch("https://cbb93ff3-7b76-4414-9c3c-9a8b2d20902b.pushnotifications.pusher.com/publish_api/v1/instances/cbb93ff3-7b76-4414-9c3c-9a8b2d20902b/publishes", {
                     method: "POST",
                     headers: {
