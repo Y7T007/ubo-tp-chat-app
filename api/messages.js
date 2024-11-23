@@ -48,6 +48,9 @@ export default async function handler(request) {
             if (image) {
                 const uploadResponse = await fetch(`${request.headers.get('origin')}/api/upload-image`, {
                     method: 'POST',
+                    headers: {
+                        'Authorization': request.headers.get('Authorization'),
+                    },
                     body: formData,
                 });
 

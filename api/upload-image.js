@@ -1,7 +1,6 @@
 import { put } from "@vercel/blob";
-import {Redis} from "@upstash/redis";
+import { Redis } from "@upstash/redis";
 const redis = Redis.fromEnv();
-
 
 export default async function handler(request) {
     try {
