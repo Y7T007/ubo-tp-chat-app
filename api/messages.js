@@ -58,6 +58,14 @@ export default async function handler(request, response) {
             `;
 
             try {
+                const { rowCount, rows } = await sql`
+                    SELECT external_id FROM users WHERE user_id = ${to}
+                `;
+                if (rowCount === 0) {
+                    return jsonResponse(response, { message: "User not found" }, 404);
+                }
+                const externalId = rows[0].external_id;
+
                 let token = request.headers.get('Authorization')?.replace("Bearer ", "");
                 if (!token) return null;
                 console.log("The origin URL is : ", request.headers.get('origin'));
@@ -67,7 +75,7 @@ export default async function handler(request, response) {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ recipientId: to, messageContent: content || "Image" }),
+                    body: JSON.stringify({ recipientId: externalId, messageContent: content || "Image" }),
                 });
 
                 console.log("Notification request status:");

@@ -1,10 +1,7 @@
 import PushNotifications from "@pusher/push-notifications-server";
-import {Redis} from "@upstash/redis";
-import {sql} from "@vercel/postgres";
+import { Redis } from "@upstash/redis";
 const redis = Redis.fromEnv();
 
-
-// Initialize Pusher Beams client
 const beamsClient = new PushNotifications({
     instanceId: process.env.PUSHER_INSTANCE_ID,
     secretKey: process.env.PUSHER_SECRET_KEY,
@@ -24,15 +21,9 @@ export default async function handler(request) {
                 headers: { 'content-type': 'application/json' },
             });
         }
-        console.log(request.body.recipientId);
-
-        const {rowCount, rows} = await sql`select external_id,username from users where user_id=${request.body.recipientId}`;
-        console.log("Got " + rowCount + " users");
-        const external_id=rows[0].external_id;
-        const current_username=rows[0].username;
 
         const { recipientId, messageContent } = await request.body;
-        if (!external_id || !messageContent) {
+        if (!recipientId || !messageContent) {
             return new Response(JSON.stringify({ message: "Bad Request" }), {
                 status: 400,
                 headers: { 'content-type': 'application/json' },
@@ -40,14 +31,13 @@ export default async function handler(request) {
         }
 
         try {
-            await beamsClient.publishToUsers([external_id],
-            {
-                interests: [external_id],
+            await beamsClient.publishToUsers([recipientId], {
+                interests: [recipientId],
                 web: {
                     notification: {
-                        title: current_username,
-                            body: `New message: ${messageContent} `,
-                            deep_link: 'https://your-app.com/messages', // Adjust the link as needed
+                        title: "New Message",
+                        body: `New message: ${messageContent}`,
+                        deep_link: 'https://your-app.com/messages',
                     },
                 }
             });
@@ -94,4 +84,3 @@ export function unauthorizedResponse() {
         headers: { 'content-type': 'application/json' },
     });
 }
-
