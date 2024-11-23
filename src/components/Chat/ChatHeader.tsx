@@ -1,21 +1,32 @@
-import { AppBar, Toolbar, Typography } from "@mui/material";
+import { AppBar, Toolbar, Typography, IconButton, Box, Avatar } from "@mui/material";
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 interface ChatHeaderProps {
     selectedUserName: string;
+    onRefresh: () => void;
 }
 
-const ChatHeader = ({ selectedUserName }: ChatHeaderProps) => {
+const ChatHeader = ({ selectedUserName, onRefresh }: ChatHeaderProps) => {
     return (
-        <AppBar position="static">
-            <Toolbar>
-                <Typography variant="h6">UBO-TP-CHAT-APP</Typography>
-                {selectedUserName && (
-                    <Typography variant="h6" sx={{ marginLeft: "auto" }}>
-                        Chatting with {selectedUserName}
-                    </Typography>
-                )}
-            </Toolbar>
-        </AppBar>
+        <Box
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '25px',
+                backdropFilter: 'blur(12px)',
+                padding: 2,
+                marginBottom: 2,
+            }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar sx={{ marginRight: 2 }}>U</Avatar>
+                <Typography variant="h6" sx={{ color: 'black' }}>{selectedUserName}</Typography>
+            </Box>
+            <IconButton color="inherit" onClick={onRefresh}>
+                <RefreshIcon />
+            </IconButton>
+        </Box>
     );
 };
 

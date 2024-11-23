@@ -1,7 +1,11 @@
 import ChatApp from "../components/Chat/ChatApp";
 
 const ChatAppPage = () => {
-    return <ChatApp />;
+    return (
+    <div className="font-sans">
+        <ChatApp/>
+    </div>
+    );
 };
 
 export default ChatAppPage;

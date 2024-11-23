@@ -1,5 +1,4 @@
-import {useEffect, useRef, useState} from "react";
-import { Container, Box } from "@mui/joy";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
@@ -7,8 +6,13 @@ import GroupChat from "../Group/GroupChat";
 import Sidebar from "../SideBar/SideBar";
 import { getUsers, getMessages, checkSession } from "../../services/chatApi";
 import { User, Room } from "../../model/common";
-import GlobalStyles from "@mui/joy/GlobalStyles";
 import * as React from "react";
+import {List} from "@mui/material";
+import Message from "./Message";
+import ChatInput from "./ChatInput";
+import { Container, Box, Typography } from '@mui/joy';
+import { GlobalStyles } from '@mui/joy';
+
 
 const ChatApp = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -83,6 +87,23 @@ const ChatApp = () => {
         };
     };
 
+    const refreshMessages = async () => {
+        if (selectedUser) {
+            const messages = await getMessages(selectedUser.user_id);
+            setMessages(messages);
+        }
+    };
+
+    useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                const payload = event.data;
+                console.log("Received notification:", payload);
+                refreshMessages();
+            });
+        }
+    }, [selectedUser]);
+
     const checkForNewMessages = async () => {
         try {
             const response = await fetch("/api/new-messages", {
@@ -106,45 +127,89 @@ const ChatApp = () => {
         }
     };
 
-
     return (
         <Container
             sx={{
+                display: 'flex',
+                width: '100vw',
+                height: '100vh',
+                maxWidth: '100% !important', // Add this line
                 backgroundImage: 'url(https://images.unsplash.com/photo-1527181152855-fc03fc7949c8?auto=format&w=1000&dpr=2)',
-            }}>
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }}
+        >
             <GlobalStyles
                 styles={{
                     ':root': {
-                        '--Form-maxWidth': '800px',
                         '--Transition-duration': '0.4s',
                     },
                 }}
             />
-            <Box
-                sx={(theme) => ({
-                    width: { xs: '100%', md: '50vw' },
-                    transition: 'width var(--Transition-duration)',
-                    transitionDelay: 'calc(var(--Transition-duration) + 0.1s)',
-                    position: 'relative',
-                    zIndex: 1,
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                })}>
-                <Box sx={{ display: "flex", flex: 1 }}>
-                    <Sidebar users={users} onSelectUser={handleSelectUser} onSelectRoom={handleSelectRoom} />
-                    {selectedRoom ? (
-                        <Box sx={{ display: "flex", flexDirection: "column"}}>
-                            <ChatHeader selectedUserName={selectedUserName} />
-                            <GroupChat selectedRoom={selectedRoom} />
+            <Sidebar users={users} onSelectUser={handleSelectUser} onSelectRoom={handleSelectRoom} />
+            <>
+                {selectedUser ? (
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            flex: 1,
+                            height: '100%',
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderRadius: '25px',
+                            backdropFilter: 'blur(12px)',
+                            marginLeft: 2,
+                        }}
+                    >
+                        <ChatHeader selectedUserName={selectedUserName} onRefresh={refreshMessages} />
+                        <Box sx={{ flex: 1, overflowY: 'auto' }}>
+                            {selectedRoom ? (
+                                <GroupChat selectedRoom={selectedRoom} />
+                            ) : (
+                                <ChatMessages messages={messages} selectedUser={selectedUser} onMessageSent={handleMessageSent} />
+                            )}
                         </Box>
-                    ) : (
-                        <Box sx={{ display: "flex", flexDirection: "column"}}>
-                            <ChatHeader selectedUserName={selectedUserName} />
-                            <ChatMessages messages={messages} selectedUser={selectedUser} onMessageSent={handleMessageSent} />
+                    </Box>
+                ) : (
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%',
+                            height: '100%',
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                backgroundColor: 'rgba(255,255,255,0.3)',
+                                borderRadius: '16px',
+                                backdropFilter: 'blur(10px)',
+                                padding: 3,
+                                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+                                textAlign: 'center',
+                                maxWidth: '400px',
+                            }}
+                        >
+                            <Typography
+                                level="h2"
+                                sx={{ marginBottom: 1, fontFamily: 'Poppins, sans-serif !important' }}
+                            >
+                                📨 Start Chatting !!
+                            </Typography>
+                            <Typography
+                                level="h4"
+                                sx={{ fontFamily: 'Poppins, sans-serif !important' }}
+                            >
+                                Please select a user to start chatting.
+                            </Typography>
+
                         </Box>
-                    )}
-                </Box>
-            </Box>
+
+                    </Box>
+                )}
+            </>
         </Container>
     );
 };
