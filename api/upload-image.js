@@ -2,9 +2,6 @@ import { put } from "@vercel/blob";
 import {Redis} from "@upstash/redis";
 const redis = Redis.fromEnv();
 
-export const config = {
-    runtime: 'edge',
-};
 
 export default async function handler(request) {
     try {
