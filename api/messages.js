@@ -1,7 +1,6 @@
 import { getConnecterUser, unauthorizedResponse } from "../lib/session";
 import { sql } from "@vercel/postgres";
 import { Redis } from "@upstash/redis";
-import { put } from "@vercel/blob";
 
 const redis = Redis.fromEnv();
 
@@ -51,10 +50,10 @@ export default async function handler(request) {
             let imageUrl = null;
             if (image) {
                 const imageBuffer = await image.arrayBuffer();
-                const blob = await put(`image_${Date.now()}`, imageBuffer, {
-                    access: 'public',
-                });
-                imageUrl = blob.url;
+                const imageBase64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
+                const imageKey = `image_${Date.now()}`;
+                await redis.set(imageKey, imageBase64);
+                imageUrl = imageKey;
             }
 
             await sql`
