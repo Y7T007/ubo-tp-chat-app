@@ -1,28 +1,21 @@
 import { put } from "@vercel/blob";
-import {Redis} from "@upstash/redis";
+import { Redis } from "@upstash/redis";
 const redis = Redis.fromEnv();
 
-
-export default async function handler(request) {
+export default async function handler(request, response) {
     try {
         const user = await getConnecterUser(request);
-        if (!user) return unauthorizedResponse();
+        if (!user) return unauthorizedResponse(response);
 
         if (request.method !== "POST") {
-            return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
-                status: 405,
-                headers: { 'content-type': 'application/json' },
-            });
+            return jsonResponse(response, { message: "Method Not Allowed" }, 405);
         }
 
         const formData = await request.formData();
         const image = formData.get("image");
 
         if (!image) {
-            return new Response(JSON.stringify({ message: "Bad Request" }), {
-                status: 400,
-                headers: { 'content-type': 'application/json' },
-            });
+            return jsonResponse(response, { message: "Bad Request" }, 400);
         }
 
         const imageBuffer = await image.arrayBuffer();
@@ -30,19 +23,12 @@ export default async function handler(request) {
             access: 'public',
         });
 
-        return new Response(JSON.stringify({ imageUrl: blob.url }), {
-            status: 201,
-            headers: { 'content-type': 'application/json' },
-        });
+        return jsonResponse(response, { imageUrl: blob.url }, 201);
     } catch (error) {
         console.error("Handler error:", error);
-        return new Response(JSON.stringify({ message: "Internal Server Error" }), {
-            status: 500,
-            headers: { 'content-type': 'application/json' },
-        });
+        return jsonResponse(response, { message: "Internal Server Error" }, 500);
     }
 }
-
 
 export async function getConnecterUser(request) {
     let token = new Headers(request.headers).get('Authorization');
@@ -59,11 +45,11 @@ export async function getConnecterUser(request) {
     return user;
 }
 
-export function unauthorizedResponse() {
+export function unauthorizedResponse(response) {
     const error = { code: "UNAUTHORIZED", message: "Session expired" };
-    return new Response(JSON.stringify(error), {
-        status: 401,
-        headers: { 'content-type': 'application/json' },
-    });
+    return jsonResponse(response, error, 401);
 }
 
+function jsonResponse(response, data, status) {
+    return response.status(status).json(data);
+}

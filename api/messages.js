@@ -5,18 +5,15 @@ export const config = {
     runtime: 'edge',
 };
 
-export default async function handler(request) {
+export default async function handler(request, response) {
     try {
         const user = await getConnecterUser(request);
-        if (!user) return unauthorizedResponse();
+        if (!user) return unauthorizedResponse(response);
 
         if (request.method === "GET") {
             const toUserId = new URL(request.url).searchParams.get("toUserId");
             if (!toUserId) {
-                return new Response(JSON.stringify({ message: "Bad Request" }), {
-                    status: 400,
-                    headers: { 'content-type': 'application/json' },
-                });
+                return jsonResponse(response, { message: "Bad Request" }, 400);
             }
 
             const { rowCount, rows } = await sql`
@@ -25,10 +22,7 @@ export default async function handler(request) {
                    OR (to_user = ${toUserId} AND from_user = ${user.id})
                 ORDER BY created_on ASC
             `;
-            return new Response(JSON.stringify(rowCount === 0 ? [] : rows), {
-                status: 200,
-                headers: { 'content-type': 'application/json' },
-            });
+            return jsonResponse(response, rowCount === 0 ? [] : rows, 200);
         }
 
         if (request.method === "POST") {
@@ -38,10 +32,7 @@ export default async function handler(request) {
             const image = formData.get("image");
 
             if ((!content && !image) || !to) {
-                return new Response(JSON.stringify({ message: "Bad Request" }), {
-                    status: 400,
-                    headers: { 'content-type': 'application/json' },
-                });
+                return jsonResponse(response, { message: "Bad Request" }, 400);
             }
 
             let imageUrl = null;
@@ -84,21 +75,16 @@ export default async function handler(request) {
                 console.error("Error sending notification request:", fetchError);
             }
 
-            return new Response(JSON.stringify({ message: "Message sent" }), {
-                status: 201,
-                headers: { 'content-type': 'application/json' },
-            });
+            return jsonResponse(response, { message: "Message sent" }, 201);
         }
 
-        return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
-            status: 405,
-            headers: { 'content-type': 'application/json' },
-        });
+        return jsonResponse(response, { message: "Method Not Allowed" }, 405);
     } catch (error) {
         console.error("Handler error:", error);
-        return new Response(JSON.stringify({ message: "Internal Server Error" }), {
-            status: 500,
-            headers: { 'content-type': 'application/json' },
-        });
+        return jsonResponse(response, { message: "Internal Server Error" }, 500);
     }
+}
+
+function jsonResponse(response, data, status) {
+    return response.status(status).json(data);
 }
