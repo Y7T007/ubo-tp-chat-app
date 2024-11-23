@@ -51,5 +51,12 @@ export function unauthorizedResponse(response) {
 }
 
 function jsonResponse(response, data, status) {
-    return response.status(status).json(data);
+    if (typeof response.status === 'function') {
+        return response.status(status).json(data);
+    } else {
+        return new Response(JSON.stringify(data), {
+            status: status,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
 }

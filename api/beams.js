@@ -1,67 +1,54 @@
 import PushNotifications from "@pusher/push-notifications-server";
-import { Redis } from "@upstash/redis";
+import {Redis} from "@upstash/redis";
 const redis = Redis.fromEnv();
 
-export const config = {
-    runtime: 'edge',
-};
-
-export default async function handler(request) {
+export default async function handler(request, response) {
     try {
         const user = await getConnecterUser(request);
         if (!user) {
             console.log("Not connected");
-            return unauthorizedResponse();
+            return response.status(401).json({ code: "UNAUTHORIZED", message: "Session expired" });
         }
         if (request.method !== "GET") {
-            return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
-                status: 405,
-                headers: { 'content-type': 'application/json' },
-            });
+            return response.status(405).json({ message: "Method Not Allowed" });
         }
 
-        const userIDInQueryParam = new URL(request.url).searchParams.get("user_id");
+        const userIDInQueryParam = request.query.user_id;
+
+        console.log("PushToken : " + userIDInQueryParam + " -> " + JSON.stringify(user));
 
         if (!user || user.externalId !== userIDInQueryParam) {
             console.log("Not connected");
-            return unauthorizedResponse();
+            return response.status(401).json({ code: "UNAUTHORIZED", message: "Session expired" });
         }
 
+        console.log("Using push instance : " + process.env.PUSHER_INSTANCE_ID);
         const beamsClient = new PushNotifications({
             instanceId: process.env.PUSHER_INSTANCE_ID,
             secretKey: process.env.PUSHER_SECRET_KEY,
         });
 
         const beamsToken = beamsClient.generateToken(user.externalId);
-        return new Response(JSON.stringify(beamsToken), {
-            status: 200,
-            headers: { 'content-type': 'application/json' },
-        });
+        console.log(JSON.stringify(beamsToken));
+        return response.status(200).json(beamsToken);
 
     } catch (error) {
         console.error("Error generating beams token:", error);
-        return new Response(JSON.stringify({ message: "Internal Server Error" }), {
-            status: 500,
-            headers: { 'content-type': 'application/json' },
-        });
+        return response.status(500).json({ message: "Internal Server Error" });
     }
 }
 
-async function getConnecterUser(request) {
+export async function getConnecterUser(request) {
     let token = new Headers(request.headers).get('Authorization');
     if (!token) {
         return null;
     } else {
         token = token.replace("Bearer ", "");
     }
+    console.log("checking " + token);
     const user = await redis.get(token);
+    if (user) {
+        console.log("Got user : " + user.username);
+    }
     return user;
-}
-
-function unauthorizedResponse() {
-    const error = { code: "UNAUTHORIZED", message: "Session expired" };
-    return new Response(JSON.stringify(error), {
-        status: 401,
-        headers: { 'content-type': 'application/json' },
-    });
 }
