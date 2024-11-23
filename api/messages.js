@@ -60,7 +60,7 @@ export default async function handler(request, response) {
             try {
                 let token = request.headers.get('Authorization')?.replace("Bearer ", "");
                 if (!token) return null;
-
+                console.log("The origin URL is : ", request.headers.get('origin'));
                 await fetch(`${request.headers.get('origin')}/api/send-notification`, {
                     method: 'POST',
                     headers: {
@@ -86,5 +86,12 @@ export default async function handler(request, response) {
 }
 
 function jsonResponse(response, data, status) {
-    return response.status(status).json(data);
+    if (typeof response.status === 'function') {
+        return response.status(status).json(data);
+    } else {
+        return new Response(JSON.stringify(data), {
+            status: status,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
 }

@@ -1,33 +1,53 @@
 import { put } from "@vercel/blob";
 import { Redis } from "@upstash/redis";
+import formidable from "formidable";
+import fs from "fs";
+
 const redis = Redis.fromEnv();
 
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
+
 export default async function handler(request, response) {
-    try {
-        const user = await getConnecterUser(request);
-        if (!user) return unauthorizedResponse(response);
+    if (request.method !== "POST") {
+        return jsonResponse(response, { message: "Method Not Allowed" }, 405);
+    }
 
-        if (request.method !== "POST") {
-            return jsonResponse(response, { message: "Method Not Allowed" }, 405);
-        }
+    const form = formidable({ multiples: true });
 
-        const formData = await request.formData();
-        const image = formData.get("image");
-
-        if (!image) {
+    form.parse(request, async (err, fields, files) => {
+        if (err) {
+            console.error("Form parse error:", err);
             return jsonResponse(response, { message: "Bad Request" }, 400);
         }
 
-        const imageBuffer = await image.arrayBuffer();
-        const blob = await put(`image_${Date.now()}`, imageBuffer, {
-            access: 'public',
-        });
+        console.log("Fields:", fields);
+        console.log("Files:", files);
 
-        return jsonResponse(response, { imageUrl: blob.url }, 201);
-    } catch (error) {
-        console.error("Handler error:", error);
-        return jsonResponse(response, { message: "Internal Server Error" }, 500);
-    }
+        try {
+            const user = await getConnecterUser(request);
+            if (!user) return unauthorizedResponse(response);
+
+            const image = files.image ? files.image[0] : null;
+            if (!image || !image.filepath) {
+                console.error("Image file is missing or filepath is undefined");
+                return jsonResponse(response, { message: "Bad Request" }, 400);
+            }
+
+            const imageBuffer = await fs.promises.readFile(image.filepath);
+            const blob = await put(`image_${Date.now()}`, imageBuffer, {
+                access: 'public',
+            });
+
+            return jsonResponse(response, { imageUrl: blob.url }, 201);
+        } catch (error) {
+            console.error("Handler error:", error);
+            return jsonResponse(response, { message: "Internal Server Error" }, 500);
+        }
+    });
 }
 
 export async function getConnecterUser(request) {
