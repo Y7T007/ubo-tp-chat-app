@@ -1,5 +1,6 @@
 import PushNotifications from "@pusher/push-notifications-server";
 import { Redis } from "@upstash/redis";
+import {capitalize} from "@mui/material";
 const redis = Redis.fromEnv();
 
 const beamsClient = new PushNotifications({
@@ -35,7 +36,7 @@ export default async function handler(request) {
                 interests: [recipientId],
                 web: {
                     notification: {
-                        title: `New Message from ${senderUsername}`,
+                        title: `${capitalize(senderUsername)}`,
                         body: `New message: ${messageContent}`,
                         deep_link: 'https://ubo-tp-chat-app.vercel.app/chat',
                     },
