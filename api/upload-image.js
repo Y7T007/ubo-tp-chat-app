@@ -1,44 +1,46 @@
 import { put } from "@vercel/blob";
 import { Redis } from "@upstash/redis";
+import formidable from "formidable";
+
 const redis = Redis.fromEnv();
 
-export default async function handler(request) {
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
+
+export default async function handler(request, response) {
     try {
         const user = await getConnecterUser(request);
-        if (!user) return unauthorizedResponse();
+        if (!user) return unauthorizedResponse(response);
 
         if (request.method !== "POST") {
-            return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
-                status: 405,
-                headers: { 'content-type': 'application/json' },
-            });
+            return response.status(405).json({ message: "Method Not Allowed" });
         }
 
-        const formData = await request.formData();
-        const image = formData.get("image");
+        const form = new formidable.IncomingForm();
+        form.parse(request, async (err, fields, files) => {
+            if (err) {
+                console.error("Form parse error:", err);
+                return response.status(400).json({ message: "Bad Request" });
+            }
 
-        if (!image) {
-            return new Response(JSON.stringify({ message: "Bad Request" }), {
-                status: 400,
-                headers: { 'content-type': 'application/json' },
+            const image = files.image;
+            if (!image) {
+                return response.status(400).json({ message: "Bad Request" });
+            }
+
+            const imageBuffer = await fs.promises.readFile(image.path);
+            const blob = await put(`image_${Date.now()}`, imageBuffer, {
+                access: 'public',
             });
-        }
 
-        const imageBuffer = await image.arrayBuffer();
-        const blob = await put(`image_${Date.now()}`, imageBuffer, {
-            access: 'public',
-        });
-
-        return new Response(JSON.stringify({ imageUrl: blob.url }), {
-            status: 201,
-            headers: { 'content-type': 'application/json' },
+            return response.status(201).json({ imageUrl: blob.url });
         });
     } catch (error) {
         console.error("Handler error:", error);
-        return new Response(JSON.stringify({ message: "Internal Server Error" }), {
-            status: 500,
-            headers: { 'content-type': 'application/json' },
-        });
+        return response.status(500).json({ message: "Internal Server Error" });
     }
 }
 
@@ -57,10 +59,7 @@ export async function getConnecterUser(request) {
     return user;
 }
 
-export function unauthorizedResponse() {
+export function unauthorizedResponse(response) {
     const error = { code: "UNAUTHORIZED", message: "Session expired" };
-    return new Response(JSON.stringify(error), {
-        status: 401,
-        headers: { 'content-type': 'application/json' },
-    });
+    return response.status(401).json(error);
 }
