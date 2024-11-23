@@ -50,7 +50,11 @@ export default async function handler(request) {
                     method: 'POST',
                     body: formData,
                 });
-                const uploadResult = await uploadResponse.json();
+
+                const uploadResponseText = await uploadResponse.text();
+                console.log("Upload response text:", uploadResponseText);
+
+                const uploadResult = JSON.parse(uploadResponseText);
                 imageUrl = uploadResult.imageUrl;
             }
 
