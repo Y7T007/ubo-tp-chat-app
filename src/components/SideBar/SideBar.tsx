@@ -56,15 +56,25 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom, toggleSidebar }: SidebarPr
         setNewGroupName("");
     };
 
+    const handleSelectUser = (user: User) => {
+        onSelectUser(user);
+        setIsSidebarCollapsed(true);
+    };
+
+    const handleSelectRoom = (room: Room) => {
+        onSelectRoom(room);
+        setIsSidebarCollapsed(true);
+    };
+
     return (
         <>
             {!isSidebarCollapsed && (
                 <Box
                     sx={{
-                        width: 200,
+                        width: { xs: '100%', sm: 200 },
                         display: "flex",
                         flexDirection: "column",
-                        height: "100vh",
+                        height: { xs: 'auto', sm: "100vh" },
                         borderRadius: "25px",
                         backdropFilter: "blur(12px)",
                         backgroundColor: "rgba(255, 255, 255, 0.2)",
@@ -72,6 +82,8 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom, toggleSidebar }: SidebarPr
                         paddingRight: 2,
                         color: "black",
                         transition: "width 0.3s",
+                        position: { xs: 'absolute', sm: 'relative' },
+                        zIndex: { xs: 1000, sm: 'auto' },
                     }}
                 >
                     <GlobalStyles
@@ -149,7 +161,7 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom, toggleSidebar }: SidebarPr
                                 <ListItemText primary="Users" />
                             </ListItemButton>
                             <Collapse in={openUsers} timeout="auto" unmountOnExit>
-                                <UserList users={filteredUsers} onSelectUser={onSelectUser} />
+                                <UserList users={filteredUsers} onSelectUser={handleSelectUser} />
                             </Collapse>
                             <Divider />
                             <ListItemButton
@@ -177,7 +189,7 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom, toggleSidebar }: SidebarPr
                                 New Group
                             </ListItemButton>
                             <Collapse in={openGroups} timeout="auto" unmountOnExit>
-                                <GroupList onSelectRoom={onSelectRoom} />
+                                <GroupList onSelectRoom={handleSelectRoom} />
                             </Collapse>
                             <Divider />
                         </Box>
@@ -246,5 +258,4 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom, toggleSidebar }: SidebarPr
         </>
     );
 };
-
 export default Sidebar;
