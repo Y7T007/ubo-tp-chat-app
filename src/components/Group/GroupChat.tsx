@@ -78,13 +78,7 @@ const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
 
     return (
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            <Typography
-                id="group-chat-demo"
-                level="body-xs"
-                sx={{ textTransform: 'uppercase', letterSpacing: '0.15rem' }}
-            >
-                Group Chat
-            </Typography>
+
             <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
                 <List
                     aria-labelledby="group-chat-demo"
