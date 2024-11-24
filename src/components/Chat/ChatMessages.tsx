@@ -76,7 +76,7 @@ class ChatMessages extends Component<ChatMessagesProps> {
                                         content={message.content}
                                         imageUrl={message.image_url}
                                         isSender={message.from_user === currentUserId}
-                                        timestamp={message.created_on} // Pass timestamp prop
+                                        timestamp={message.created_on}
                                     />
                                 ))}
                                 <div ref={this.messagesEndRef} />

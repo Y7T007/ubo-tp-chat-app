@@ -3,12 +3,15 @@ import { Box, Typography, List, ListItem, ListItemDecorator, ListItemContent, Av
 import { getRoomMessages, sendRoomMessage } from "../../services/chatApi";
 import { TextField, Button, IconButton } from "@mui/material";
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import Message from "../Chat/Message";
 
 interface Message {
     id: number;
     user: string;
     content: string;
     from_user: number;
+    created_on: string;
+    imageUrl?: string;
 }
 
 interface Room {
@@ -78,24 +81,20 @@ const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
 
     return (
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-
             <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
                 <List
                     aria-labelledby="group-chat-demo"
                     sx={{ '--ListItemDecorator-size': '56px' }}
                 >
                     {messages.map((message: Message) => (
-                        <ListItem key={message.id}>
-                            <ListItemDecorator>
-                                <Avatar src={`/static/images/avatar/${message.from_user}.jpg`} />
-                            </ListItemDecorator>
-                            <ListItemContent>
-                                <Typography level="title-sm">{message.user}</Typography>
-                                <Typography level="body-sm" noWrap>
-                                    {message.content}
-                                </Typography>
-                            </ListItemContent>
-                        </ListItem>
+                        <Message
+                            key={message.id}
+                            user={message.user}
+                            content={message.content}
+                            imageUrl={message.imageUrl}
+                            isSender={message.from_user === currentUserId}
+                            timestamp={message.created_on}
+                        />
                     ))}
                 </List>
             </Box>
