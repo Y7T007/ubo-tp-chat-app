@@ -80,13 +80,10 @@ export const getRoomMessages = async (roomId: number) => {
     }
 };
 
-export const sendRoomMessage = async ({ content, roomId }: { content: string; roomId: number }) => {
+export const sendRoomMessage = async (formData: FormData) => {
     const response = await fetch("/api/room-messages", {
         method: "POST",
         headers: getAuthHeaders(),
-        body: JSON.stringify({ content, roomId }),
+        body: formData,
     });
-    if (!response.ok) {
-        throw new Error("Failed to send room message");
-    }
 };

@@ -1,8 +1,7 @@
 import { useEffect, useState, ChangeEvent } from "react";
-import { Box, Typography, List, ListItem, ListItemDecorator, ListItemContent, Avatar } from "@mui/joy";
-import { getRoomMessages, sendRoomMessage } from "../../services/chatApi";
-import { TextField, Button, IconButton } from "@mui/material";
+import { Box, List, TextField, Button, IconButton } from "@mui/material";
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import { getRoomMessages, sendRoomMessage } from "../../services/chatApi";
 import Message from "../Chat/Message";
 
 interface Message {
@@ -11,7 +10,7 @@ interface Message {
     content: string;
     from_user: number;
     created_on: string;
-    imageUrl?: string;
+    image_url?: string;
 }
 
 interface Room {
@@ -49,7 +48,7 @@ const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
             if (gif) {
                 formData.append("image", gif);
             }
-            await sendRoomMessage({ content: message, roomId: selectedRoom.room_id });
+            await sendRoomMessage(formData);
             setMessage("");
             setGif(null);
             setThumbnail(null);
@@ -82,16 +81,13 @@ const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
     return (
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
-                <List
-                    aria-labelledby="group-chat-demo"
-                    sx={{ '--ListItemDecorator-size': '56px' }}
-                >
+                <List aria-labelledby="group-chat-demo" sx={{ '--ListItemDecorator-size': '56px' }}>
                     {messages.map((message: Message) => (
                         <Message
                             key={message.id}
                             user={message.user}
                             content={message.content}
-                            imageUrl={message.imageUrl}
+                            imageUrl={message.image_url}
                             isSender={message.from_user === currentUserId}
                             timestamp={message.created_on}
                         />
