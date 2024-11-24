@@ -22,6 +22,8 @@ const ChatApp = () => {
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
     const navigate = useNavigate();
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
 
     useEffect(() => {
         const initialize = async () => {
@@ -138,10 +140,11 @@ const ChatApp = () => {
                 display: 'flex',
                 width: '100vw',
                 height: '100vh',
-                maxWidth: '100% !important', // Add this line
+                maxWidth: '100% !important',
                 backgroundImage: 'url(https://images.unsplash.com/photo-1527181152855-fc03fc7949c8?auto=format&w=1000&dpr=2)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
+                flexDirection: { xs: 'column', sm: 'row' },
             }}
         >
             <GlobalStyles
@@ -151,7 +154,14 @@ const ChatApp = () => {
                     },
                 }}
             />
-            <Sidebar users={users} onSelectUser={handleSelectUser} onSelectRoom={handleSelectRoom} />
+            {isSidebarOpen && (
+                <Sidebar
+                    users={users}
+                    onSelectUser={handleSelectUser}
+                    onSelectRoom={handleSelectRoom}
+                    toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+                />
+            )}
             <>
                 {(selectedUser || selectedRoom) ? (
                     <Box

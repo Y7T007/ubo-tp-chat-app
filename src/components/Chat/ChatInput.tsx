@@ -63,11 +63,17 @@ const ChatInput = ({ selectedUser, onMessageSent }: ChatInputProps) => {
                 display: "flex",
                 alignItems: "center",
                 padding: 2,
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'rgba(255,255,255,0.44)',
                 borderRadius: '25px',
-                backdropFilter: 'blur(12px)',
-                marginTop: 2,
+                backdropFilter: 'blur(5px)',
                 gap: 2,
+                position: "fixed",
+                bottom: 0,
+                width: "90%",
+                marginLeft: "5%",
+                marginRight: "5%",
+                marginBottom: "25px",
+                zIndex: 10,
             }}
         >
             <TextField

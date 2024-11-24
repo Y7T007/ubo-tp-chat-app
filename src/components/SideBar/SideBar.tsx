@@ -15,11 +15,14 @@ import GlobalStyles from "@mui/joy/GlobalStyles";
 import { createGroup } from "../../services/roomsApi";
 import {Add} from "@mui/icons-material";
 
+
 interface SidebarProps {
     users: User[];
     onSelectUser: (user: User) => void;
     onSelectRoom: (room: Room) => void;
+    toggleSidebar: () => void;
 }
+
 
 const Sidebar = ({ users, onSelectUser, onSelectRoom }: SidebarProps) => {
     const [openUsers, setOpenUsers] = useState(true);
@@ -46,7 +49,7 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom }: SidebarProps) => {
 
     return (
         <Box sx={{
-            width: 200,
+            width: { xs: '100%', sm: 200 },
             display: "flex",
             flexDirection: "column",
             height: "100vh",
@@ -55,7 +58,9 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom }: SidebarProps) => {
             backgroundColor: "rgba(255, 255, 255, 0.2)",
             paddingLeft: 2,
             paddingRight: 2,
-            color: "black", // Ensure text color is black
+            color: "black",
+            position: { xs: 'absolute', sm: 'static' },
+            zIndex: 10,
         }}>
             <GlobalStyles
                 styles={{
