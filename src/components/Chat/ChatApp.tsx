@@ -204,7 +204,7 @@ const ChatApp = () => {
                                 padding: 3,
                                 boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
                                 textAlign: 'center',
-                                maxWidth: '400px',
+                                maxWidth: '40%',
                             }}
                         >
                             <Typography
