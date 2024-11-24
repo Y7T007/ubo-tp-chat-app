@@ -32,16 +32,21 @@ const Message = ({ user, content, imageUrl, isSender, timestamp, footerText }: M
     return (
         <div className={`chat ${isSender ? "chat-end" : "chat-start"}`}>
             <div className="chat-bubble min-w-2.5">
-                {imageSrc && (
+                {imageSrc ? (
                     <div className="chat-image avatar mb-2">
                         <div className="w-10 rounded-full">
-                            <img alt="User avatar" src={imageSrc} />
+                             <img alt="User avatar" src={imageSrc} />
                         </div>
                     </div>
-                )}
+                ):(
+                    <>
+                        <strong>
+                            {user}
+                        </strong>
+                    </>)}
                 <div className="text-white">{content}</div>
                 <div className="chat-header text-white bg-gray-800 p-2 rounded-t-lg">
-                    {user}
+                     &nbsp;-&nbsp;
                     <time className="text-xs opacity-50">{formattedTimestamp}</time>
                 </div>
                 {footerText && <div className="chat-footer text-gray-400 opacity-50">{footerText}</div>}

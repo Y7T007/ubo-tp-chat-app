@@ -61,12 +61,13 @@ const ChatApp = () => {
     const handleSelectUser = (user: User) => {
         setSelectedUser(user);
         setSelectedUserName(user.username);
-        setSelectedRoom(null); // Deselect room when a user is selected
+        setSelectedRoom(null);
     };
 
     const handleSelectRoom = (room: Room) => {
         setSelectedRoom(room);
-        setSelectedUser(null); // Deselect user when a room is selected
+        setSelectedUserName(room.name);
+        setSelectedUser(null);
     };
 
     const handleMessageSent = async () => {
@@ -148,7 +149,7 @@ const ChatApp = () => {
             />
             <Sidebar users={users} onSelectUser={handleSelectUser} onSelectRoom={handleSelectRoom} />
             <>
-                {selectedUser ? (
+                {(selectedUser || selectedRoom) ? (
                     <Box
                         sx={{
                             display: 'flex',
@@ -161,7 +162,7 @@ const ChatApp = () => {
                             marginLeft: 2,
                         }}
                     >
-                        <ChatHeader selectedUserName={selectedUserName} onRefresh={refreshMessages} />
+                        <ChatHeader selectedUserName={selectedUserName??selectedRoom} onRefresh={refreshMessages} />
                         <Box sx={{ flex: 1, overflowY: 'auto' }}>
                             {selectedRoom ? (
                                 <GroupChat selectedRoom={selectedRoom} />
