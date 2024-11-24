@@ -4,7 +4,7 @@ import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
 import GroupChat from "../Group/GroupChat";
 import Sidebar from "../SideBar/SideBar";
-import { getUsers, getMessages, checkSession } from "../../services/chatApi";
+import { getUsers, getMessages, checkSession, getRoomMessages } from "../../services/chatApi";
 import { User, Room } from "../../model/common";
 import * as React from "react";
 import {List} from "@mui/material";
@@ -91,6 +91,10 @@ const ChatApp = () => {
     const refreshMessages = async () => {
         if (selectedUser) {
             const messages = await getMessages(selectedUser.user_id);
+            setMessages(messages);
+        }
+        if (selectedRoom) {
+            const messages = await getRoomMessages(selectedRoom.room_id);
             setMessages(messages);
         }
     };

@@ -1,6 +1,7 @@
-import { useEffect, useState, ChangeEvent } from "react";
+import { useEffect, useState, ChangeEvent, useRef } from "react";
 import { Box, List, TextField, Button, IconButton } from "@mui/material";
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { getRoomMessages, sendRoomMessage } from "../../services/chatApi";
 import Message from "../Chat/Message";
 
@@ -24,40 +25,42 @@ const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
     const [gif, setGif] = useState<File | null>(null);
     const [thumbnail, setThumbnail] = useState<string | null>(null);
     const currentUserId = parseInt(sessionStorage.getItem("id") || "0");
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-        const fetchMessages = async () => {
-            if (selectedRoom) {
-                const response = await getRoomMessages(selectedRoom.room_id);
-                if (Array.isArray(response)) {
-                    setMessages(response);
-                } else {
-                    setMessages([]);
-                }
-            }
-        };
-
-        fetchMessages();
-    }, [selectedRoom]);
-
-    const handleSend = async () => {
-        if (message.trim() && selectedRoom) {
-            const formData = new FormData();
-            formData.append("content", message);
-            formData.append("roomId", selectedRoom.room_id.toString());
-            if (gif) {
-                formData.append("image", gif);
-            }
-            await sendRoomMessage(formData);
-            setMessage("");
-            setGif(null);
-            setThumbnail(null);
+    const fetchMessages = async () => {
+        if (selectedRoom) {
             const response = await getRoomMessages(selectedRoom.room_id);
             if (Array.isArray(response)) {
                 setMessages(response);
             } else {
                 setMessages([]);
             }
+        }
+    };
+
+    useEffect(() => {
+        fetchMessages();
+    }, [selectedRoom]);
+
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages]);
+
+    const handleSend = async () => {
+        if ((message.trim() || gif) && selectedRoom) {
+            const formData = new FormData();
+            formData.append("content", message);
+            formData.append("roomId", selectedRoom.room_id.toString());
+            if (gif) {
+                formData.append("image", gif);
+            }
+            sendRoomMessage(formData);
+            setMessage("");
+            setGif(null);
+            setThumbnail(null);
+            setTimeout(fetchMessages, 1000);
         }
     };
 
@@ -79,8 +82,13 @@ const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
     };
 
     return (
-        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            <Box sx={{ flex: 1, overflowY: "auto", padding: 2 }}>
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column", position: "relative" }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 2 }}>
+                <IconButton onClick={fetchMessages}>
+                    <RefreshIcon />
+                </IconButton>
+            </Box>
+            <Box sx={{ flex: 1, overflowY: "auto", padding: 2, zIndex: 1, marginBottom: '100px' }}>
                 <List aria-labelledby="group-chat-demo" sx={{ '--ListItemDecorator-size': '56px' }}>
                     {messages.map((message: Message) => (
                         <Message
@@ -92,6 +100,7 @@ const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
                             timestamp={message.created_on}
                         />
                     ))}
+                    <div ref={messagesEndRef} />
                 </List>
             </Box>
             <Box
@@ -99,11 +108,17 @@ const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
                     display: "flex",
                     alignItems: "center",
                     padding: 2,
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    backgroundColor: 'rgba(255,255,255,0.44)',
                     borderRadius: '25px',
-                    backdropFilter: 'blur(12px)',
-                    marginTop: 2,
+                    backdropFilter: 'blur(5px)',
                     gap: 2,
+                    position: "fixed",
+                    bottom: 0,
+                    width: "90%",
+                    marginLeft: "5%",
+                    marginRight: "5%",
+                    marginBottom: "25px",
+                    zIndex: 10,
                 }}
             >
                 <TextField
@@ -151,7 +166,7 @@ const GroupChat = ({ selectedRoom }: { selectedRoom: Room | null }) => {
                     variant="contained"
                     color="primary"
                     onClick={handleSend}
-                    disabled={!message && !gif}
+                    disabled={!message.trim() && !gif}
                     sx={{
                         backgroundColor: "rgba(255, 255, 255, 0.1)",
                         borderRadius: "15px",

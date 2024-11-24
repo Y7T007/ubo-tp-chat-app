@@ -1,4 +1,4 @@
-import { Box, Collapse, List, ListItemButton, ListItemText, Divider, TextField, InputAdornment } from "@mui/material";
+import { Box, Collapse, List, ListItemButton, ListItemText, Divider, TextField, InputAdornment, Button, Modal } from "@mui/material";
 import { useState } from "react";
 import UserList from "../User/UserList";
 import GroupList from "../Group/GroupList";
@@ -12,6 +12,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SearchIcon from '@mui/icons-material/Search';
 import GlobalStyles from "@mui/joy/GlobalStyles";
+import { createGroup } from "../../services/roomsApi";
 
 interface SidebarProps {
     users: User[];
@@ -23,13 +24,23 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom }: SidebarProps) => {
     const [openUsers, setOpenUsers] = useState(true);
     const [openGroups, setOpenGroups] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [newGroupName, setNewGroupName] = useState("");
 
     const filteredUsers = users.filter(user =>
         user.username.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
     const handleLogout = () => {
         sessionStorage.clear();
         window.location.reload();
+    };
+
+    const handleCreateGroup = async () => {
+        // Call the API to create a new group
+        await createGroup(newGroupName);
+        setIsModalOpen(false);
+        setNewGroupName("");
     };
 
     return (
@@ -119,6 +130,9 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom }: SidebarProps) => {
                     </Collapse>
                     <Divider />
                 </Box>
+                <Button variant="contained" color="primary" onClick={() => setIsModalOpen(true)}>
+                    Create Group
+                </Button>
             </List>
             <Box sx={{ mt: "auto", p: 2 }}>
                 <ListItemButton onClick={handleLogout} sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderRadius: "15px", color: "black" }}>
@@ -126,6 +140,22 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom }: SidebarProps) => {
                     <ListItemText primary="Logout" />
                 </ListItemButton>
             </Box>
+            <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <Box sx={{ padding: 4, backgroundColor: 'white', borderRadius: 2, width: 300, margin: 'auto', marginTop: '20%' }}>
+                    <Typography >Create New Group</Typography>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        placeholder="Group Name"
+                        value={newGroupName}
+                        onChange={(e) => setNewGroupName(e.target.value)}
+                        sx={{ marginTop: 2 }}
+                    />
+                    <Button variant="contained" color="primary" onClick={handleCreateGroup} sx={{ marginTop: 2 }}>
+                        Create
+                    </Button>
+                </Box>
+            </Modal>
         </Box>
     );
 };
