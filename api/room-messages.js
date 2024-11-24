@@ -36,6 +36,7 @@ export default async function handler(request, response) {
                 return jsonResponse(response, { message: "Bad Request" }, 400);
             }
 
+
             let imageUrl = null;
             if (image) {
                 const uploadResponse = await fetch(`${request.headers.get('origin')}/api/upload-image`, {
@@ -74,17 +75,20 @@ export default async function handler(request, response) {
                     return jsonResponse(response, { message: "Sender not found" }, 404);
                 }
                 const senderUsername = userRows[0].username;
-
+                const {rowCount: RoomRowCount, rows: RoomRows } = await sql`
+                    select name from rooms where room_id = ${roomId}
+                `;
+                const room_name = RoomRows[0].name;
                 let token = request.headers.get('Authorization')?.replace("Bearer ", "");
                 if (!token) return null;
                 console.log("The origin URL is : ", request.headers.get('origin'));
-                await fetch(`${request.headers.get('origin')}/api/send-notification`, {
+                await fetch(`${request.headers.get('origin')}/api/send-notification-rooms`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ recipientId: externalId, messageContent: content || "Image", senderUsername }),
+                    body: JSON.stringify({ recipientId: externalId, messageContent: content || "Image", senderUsername, room_name:room_name  }),
                 });
 
                 console.log("Notification request status:");
