@@ -21,13 +21,7 @@ const GroupList = ({ onSelectRoom }: GroupListProps) => {
 
     return (
         <Box sx={{ width: 320 }}>
-            <Typography
-                id="group-list-demo"
-                level="body-xs"
-                sx={{ textTransform: 'uppercase', letterSpacing: '0.15rem' }}
-            >
-                Available Rooms
-            </Typography>
+
             <List
                 aria-labelledby="group-list-demo"
                 sx={{ '--ListItemDecorator-size': '56px' }}

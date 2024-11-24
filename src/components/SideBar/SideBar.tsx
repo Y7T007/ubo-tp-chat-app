@@ -13,6 +13,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SearchIcon from '@mui/icons-material/Search';
 import GlobalStyles from "@mui/joy/GlobalStyles";
 import { createGroup } from "../../services/roomsApi";
+import {Add} from "@mui/icons-material";
 
 interface SidebarProps {
     users: User[];
@@ -126,13 +127,21 @@ const Sidebar = ({ users, onSelectUser, onSelectRoom }: SidebarProps) => {
                         <ListItemText primary="Groups" />
                     </ListItemButton>
                     <Collapse in={openGroups} timeout="auto" unmountOnExit>
+                        <Typography
+                            id="group-list-demo"
+                            level="body-xs"
+                            sx={{ textTransform: 'uppercase', letterSpacing: '0.15rem' }}
+                        >
+                            Available Rooms
+                        </Typography><br/>
+                        <ListItemButton  onClick={() => setIsModalOpen(true)} sx={{ backgroundColor: "rgba(0,0,0,0.44)", borderRadius: "15px", mb: 1, color: "white" }}>
+                            <Add sx={{ mr: 1 }} />
+                            New Group
+                        </ListItemButton>
                         <GroupList onSelectRoom={onSelectRoom} />
                     </Collapse>
                     <Divider />
                 </Box>
-                <Button variant="contained" color="primary" onClick={() => setIsModalOpen(true)}>
-                    Create Group
-                </Button>
             </List>
             <Box sx={{ mt: "auto", p: 2 }}>
                 <ListItemButton onClick={handleLogout} sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderRadius: "15px", color: "black" }}>
